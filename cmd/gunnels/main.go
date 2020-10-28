@@ -108,6 +108,27 @@ func main() {
 	fmt.Println("listen port to 9000 waiting user conn...")
 
 	for {
-		clientListener.Accept()
+		clientConn, err := clientListener.Accept()
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		fmt.Printf("有Client连接， addr: " + clientConn.RemoteAddr().String())
+		client := &Client{
+			Conn:    clientConn,
+			readCh:  make(chan []byte),
+			writeCh: make(chan []byte),
+			exitCh:  make(chan error),
+			reConn:  make(chan bool),
+		}
+
+		var UserChan = make(chan net.Conn)
+
+		go func(c *Client, uch chan net.Conn) {
+			go c.Read()
+			go c.Write()
+
+
+		}(client, UserChan)
 	}
 }
