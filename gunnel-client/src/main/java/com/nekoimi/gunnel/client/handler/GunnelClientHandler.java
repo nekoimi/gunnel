@@ -1,5 +1,6 @@
 package com.nekoimi.gunnel.client.handler;
 
+import com.nekoimi.gunnel.common.enums.MsgType;
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,7 +14,7 @@ public class GunnelClientHandler extends GunnelMessageHandler {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        GunnelMessage message = GunnelMessage.builder().message("hello, i am client!").build();
+        GunnelMessage message = GunnelMessage.builder().message("hello server!").type(MsgType.GU_REGISTER).build();
         ctx.writeAndFlush(message);
 
         super.channelActive(ctx);

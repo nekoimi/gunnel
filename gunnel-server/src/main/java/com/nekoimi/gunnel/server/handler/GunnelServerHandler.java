@@ -1,12 +1,10 @@
 package com.nekoimi.gunnel.server.handler;
 
+import com.nekoimi.gunnel.common.enums.MsgType;
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * nekoimi  2021/8/14 16:50
@@ -24,9 +22,9 @@ public class GunnelServerHandler extends GunnelMessageHandler {
 
         log.debug("msg: " + msg);
 
-        ByteBuf buffer = ctx.alloc().buffer();
-        buffer.writeBytes("hello world".getBytes(StandardCharsets.UTF_8));
-        ctx.writeAndFlush(buffer);
+        GunnelMessage resultMessage = GunnelMessage.builder().message("hello client!").type(MsgType.GU_DATA).build();
+
+        ctx.writeAndFlush(resultMessage);
         log.debug("------------------------ GunnelServerHandler BEGIN ------------------------");
     }
 }

@@ -10,8 +10,6 @@ import lombok.Data;
 @Data
 @Builder
 public class GunnelMessage {
-    private String channelId;
     private MsgType type;
     private Object message;
-    private byte[] data;
 }

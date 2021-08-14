@@ -1,5 +1,6 @@
 package com.nekoimi.gunnel.common.codec;
 
+import com.nekoimi.gunnel.common.constants.SystemConstants;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,7 +14,10 @@ import java.nio.charset.StandardCharsets;
 /**
  * nekoimi  2021/8/14 14:17
  * <p>
- * 服务器端消息编码器
+ * Gunnel 消息编码器
+ *
+ * 数据格式查看解码器
+ * @see GunnelMessageDecoder
  */
 @Slf4j
 public class GunnelMessageEncoder extends MessageToByteEncoder<GunnelMessage> {
@@ -21,17 +25,20 @@ public class GunnelMessageEncoder extends MessageToByteEncoder<GunnelMessage> {
     @Override
     protected void encode(ChannelHandlerContext ctx, GunnelMessage msg, ByteBuf out) throws Exception {
         log.debug("------------------------ GunnelMessageEncoder BEGIN ------------------------");
-        log.debug(msg.toString());
         try (
                 ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
                 DataOutputStream dataOutput = new DataOutputStream(byteOutput);
         ) {
-            dataOutput.writeBytes("CHANNEL-ID");
-            dataOutput.writeInt(msg.getType().getCode());
             dataOutput.write(msg.getMessage().toString().getBytes(StandardCharsets.UTF_8));
 
             byte[] bytes = byteOutput.toByteArray();
+            // 写入版本号
+            out.writeDouble(SystemConstants.VERSION);
+            // 写入消息类型
+            out.writeInt(msg.getType().getCode());
+            // 写入长度
             out.writeInt(bytes.length);
+            // 写入数据
             out.writeBytes(bytes);
         }
 

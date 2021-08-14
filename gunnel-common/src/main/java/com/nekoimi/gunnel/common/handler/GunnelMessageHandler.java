@@ -21,6 +21,7 @@ public abstract class GunnelMessageHandler extends SimpleChannelInboundHandler<G
 //        super.exceptionCaught(ctx, cause);
         log.error(cause.getMessage());
         log.error(ctx.channel().toString());
+        cause.printStackTrace();
 
         ctx.close();
     }

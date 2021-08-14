@@ -15,8 +15,15 @@ public abstract class GunnelChannelInitializer extends ChannelInitializer<Socket
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
-        // Netty的TCP分包处理器
-        pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
+        /**
+         * Netty的TCP分包处理器
+         * >> TODO 粘包、半包初始配置，根据自定义的协议
+         * @see com.nekoimi.gunnel.common.codec.GunnelMessageDecoder
+         * >> TODO Length需要偏移两个字段（版本号 + 消息类型）
+         * >> TODO Length 本身长度为4，不需要补长度，也不需要跳过某些字段
+         * >> TODO 这样解码之后 ByteBuf 里面就包含全部的数据 => 版本号 + 消息类型 + 长度 + 数据
+         */
+        pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 12, 4, 0, 0));
         // Idle 心跳监测机制
         pipeline.addLast(new IdleStateHandler(60, 30, 0));
         // 自定义协议编码解码器

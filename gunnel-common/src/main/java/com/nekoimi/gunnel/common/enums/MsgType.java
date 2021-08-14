@@ -10,7 +10,8 @@ public enum MsgType {
     GU_CONNECTED(2),
     GU_DISCONNECTED(3),
     GU_DATA(4),
-    GU_KEEPALIVE(5)
+    GU_KEEPALIVE(5),
+    GU_ERROR(9)
     ;
 
     private final int code;
