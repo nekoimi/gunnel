@@ -17,18 +17,21 @@ import java.util.List;
  * 服务器端消息解码器
  * <p>
  * 数据包格式:
- * +----------+----------+----------------+
- * |  消息类型  |   长度   |     数据        |
- * +----------+----------+----------------+
- * 1.协议开始标志 MsgType int类型
- * 2.传输数据的长度 contentLength int类型
- * 3.要传输的数据
+ * +----------+----------+----------+----------------+
+ * |   版本号  |  消息类型  |   长度   |     数据        |
+ * +----------+----------+----------+----------------+
+ * 1、服务版本号，double类型
+ * 2、消息类型，int类型
+ * 3、传输数据的长度，int类型
+ * 4、要传输的数据
  */
 @Slf4j
 public class GunnelMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         log.debug("------------------------ GunnelMessageDecoder BEGIN ------------------------");
+        // 读取一个double数据 获取服务版本号
+        double version = msg.readDouble();
         // 读取一个int数据，判断消息类型, ByteBuf 的读指针会先后移动4字节
         int msgTypeCode = msg.readInt();
         MsgType msgType = MsgType.valueOf(msgTypeCode);
