@@ -12,10 +12,15 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class GunnelMessageHandler extends SimpleChannelInboundHandler<GunnelMessage> {
 
     @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        ctx.flush();
+    }
+
+    @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
-        cause.printStackTrace();
+//        super.exceptionCaught(ctx, cause);
         log.error(cause.getMessage());
+        log.error(ctx.channel().toString());
 
         ctx.close();
     }

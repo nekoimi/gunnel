@@ -6,6 +6,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * nekoimi  2021/8/14 16:50
  *
@@ -23,6 +25,7 @@ public class GunnelServerHandler extends GunnelMessageHandler {
         log.debug("msg: " + msg);
 
         ByteBuf buffer = ctx.alloc().buffer();
+        buffer.writeBytes("hello world".getBytes(StandardCharsets.UTF_8));
         ctx.writeAndFlush(buffer);
         log.debug("------------------------ GunnelServerHandler BEGIN ------------------------");
     }

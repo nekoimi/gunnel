@@ -26,6 +26,7 @@ public class GunnelMessageEncoder extends MessageToByteEncoder<GunnelMessage> {
                 ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
                 DataOutputStream dataOutput = new DataOutputStream(byteOutput);
         ) {
+            dataOutput.writeBytes("CHANNEL-ID");
             dataOutput.writeInt(msg.getType().getCode());
             dataOutput.write(msg.getMessage().toString().getBytes(StandardCharsets.UTF_8));
 

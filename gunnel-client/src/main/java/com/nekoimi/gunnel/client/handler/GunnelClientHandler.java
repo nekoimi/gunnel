@@ -12,6 +12,14 @@ import lombok.extern.slf4j.Slf4j;
 public class GunnelClientHandler extends GunnelMessageHandler {
 
     @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        GunnelMessage message = GunnelMessage.builder().message("hello, i am client!").build();
+        ctx.writeAndFlush(message);
+
+        super.channelActive(ctx);
+    }
+
+    @Override
     protected void channelRead0(ChannelHandlerContext ctx, GunnelMessage msg) throws Exception {
         log.debug("------------------------ GunnelClientHandler BEGIN ------------------------");
         log.debug(msg.toString());
