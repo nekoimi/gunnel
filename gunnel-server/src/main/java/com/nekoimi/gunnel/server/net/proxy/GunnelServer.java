@@ -1,17 +1,16 @@
 package com.nekoimi.gunnel.server.net.proxy;
 
 import com.nekoimi.gunnel.server.net.AbstractServer;
-import com.nekoimi.gunnel.server.net.initializer.HttpServerInitializer;
+import com.nekoimi.gunnel.server.net.initializer.GunnelServerInitializer;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 
 /**
- * nekoimi  2021/8/13 23:27
+ * nekoimi  2021/8/14 17:33
  */
-public class HttpServer extends AbstractServer {
+public class GunnelServer extends AbstractServer {
     @Override
     public ChannelInitializer<SocketChannel> initializer() {
-        return new HttpServerInitializer();
+        return new GunnelServerInitializer();
     }
-
 }

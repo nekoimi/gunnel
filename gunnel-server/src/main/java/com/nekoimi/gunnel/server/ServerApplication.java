@@ -1,5 +1,6 @@
 package com.nekoimi.gunnel.server;
 
+import com.nekoimi.gunnel.server.net.proxy.GunnelServer;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -9,6 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ServerApplication {
 
     public static void main(String[] args) {
-        log.debug("hello world");
+        new GunnelServer().start();
     }
 }
