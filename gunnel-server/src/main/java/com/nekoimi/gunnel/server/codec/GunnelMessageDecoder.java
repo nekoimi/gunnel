@@ -3,11 +3,12 @@ package com.nekoimi.gunnel.server.codec;
 import com.nekoimi.gunnel.common.enums.MsgType;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelId;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import lombok.extern.slf4j.Slf4j;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -34,9 +35,14 @@ public class GunnelMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
         // 读取下一个int数据，确定需要读取的数据长度
         int length = msg.readInt();
         // 读取具体数据
-        CharSequence data = msg.readCharSequence(length, StandardCharsets.UTF_8);
+        byte[] bytes = ByteBufUtil.getBytes(msg, msg.readerIndex(), length);
 
-        GunnelMessage message = GunnelMessage.builder().type(msgType).data(data).build();
+        ChannelId channelId = ctx.channel().id();
+        String longId = channelId.asLongText();
+        String shortId = channelId.asShortText();
+        log.debug("ChannelId: " + longId + ", " + shortId);
+
+        GunnelMessage message = GunnelMessage.builder().channelId(longId).type(msgType).message(new String(bytes)).data(bytes).build();
 
         log.debug(message.toString());
 

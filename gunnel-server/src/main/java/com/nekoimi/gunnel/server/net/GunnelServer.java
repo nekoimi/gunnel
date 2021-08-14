@@ -1,6 +1,5 @@
-package com.nekoimi.gunnel.server.net.proxy;
+package com.nekoimi.gunnel.server.net;
 
-import com.nekoimi.gunnel.server.net.AbstractServer;
 import com.nekoimi.gunnel.server.net.initializer.GunnelServerInitializer;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;

@@ -1,6 +1,5 @@
 package com.nekoimi.gunnel.server.net;
 
-import com.nekoimi.gunnel.common.contract.Startable;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -13,7 +12,7 @@ import org.slf4j.LoggerFactory;
 /**
  * nekoimi  2021/8/13 23:39
  */
-public abstract class AbstractServer implements Startable {
+public abstract class AbstractServer {
     private final static Logger logger = LoggerFactory.getLogger(AbstractServer.class);
 
     private final EventLoopGroup masterGroup = new NioEventLoopGroup(1);
@@ -45,11 +44,9 @@ public abstract class AbstractServer implements Startable {
         }
     }
 
-    @Override
     public void restart() {
     }
 
-    @Override
     public void shutdown() {
         if (channel.isOpen()) {
             channel.close();

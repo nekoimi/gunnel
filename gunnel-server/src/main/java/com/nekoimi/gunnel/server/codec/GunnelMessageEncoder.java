@@ -27,7 +27,7 @@ public class GunnelMessageEncoder extends MessageToByteEncoder<GunnelMessage> {
                 DataOutputStream dataOutput = new DataOutputStream(byteOutput);
         ) {
             dataOutput.writeInt(msg.getType().getCode());
-            dataOutput.write(msg.getData().toString().getBytes(StandardCharsets.UTF_8));
+            dataOutput.write(msg.getMessage().toString().getBytes(StandardCharsets.UTF_8));
 
             byte[] bytes = byteOutput.toByteArray();
             out.writeInt(bytes.length);
