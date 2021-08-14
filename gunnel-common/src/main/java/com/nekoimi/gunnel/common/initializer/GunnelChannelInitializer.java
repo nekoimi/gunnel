@@ -1,8 +1,7 @@
-package com.nekoimi.gunnel.server.net.initializer;
+package com.nekoimi.gunnel.common.initializer;
 
-import com.nekoimi.gunnel.server.codec.GunnelMessageDecoder;
-import com.nekoimi.gunnel.server.codec.GunnelMessageEncoder;
-import com.nekoimi.gunnel.server.handler.GunnelServerHandler;
+import com.nekoimi.gunnel.common.codec.GunnelMessageDecoder;
+import com.nekoimi.gunnel.common.codec.GunnelMessageEncoder;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -10,9 +9,9 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 
 /**
- * nekoimi  2021/8/14 17:16
+ * nekoimi  2021/8/14 21:02
  */
-public class GunnelServerInitializer extends ChannelInitializer<SocketChannel> {
+public abstract class GunnelChannelInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
@@ -23,7 +22,9 @@ public class GunnelServerInitializer extends ChannelInitializer<SocketChannel> {
         // 自定义协议编码解码器
         pipeline.addLast(new GunnelMessageDecoder());
         pipeline.addLast(new GunnelMessageEncoder());
-        // Gunnel逻辑实现处理
-        pipeline.addLast(new GunnelServerHandler());
+        // 追加逻辑处理
+        channel0(pipeline);
     }
+
+    abstract protected void channel0(ChannelPipeline pipeline);
 }

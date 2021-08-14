@@ -1,4 +1,4 @@
-package com.nekoimi.gunnel.server.codec;
+package com.nekoimi.gunnel.common.codec;
 
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import io.netty.buffer.ByteBuf;

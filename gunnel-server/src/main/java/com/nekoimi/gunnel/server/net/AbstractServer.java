@@ -27,10 +27,9 @@ public abstract class AbstractServer {
     public void start() {
         bootstrap.group(masterGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
-                .handler(new LoggingHandler())
-                .childHandler(initializer())
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .childOption(ChannelOption.SO_BACKLOG, 1024);
+                .handler(new LoggingHandler())
+                .childHandler(initializer());
         try {
             channel = bootstrap.bind(9933)
                     .addListener((ChannelFutureListener) channelFuture -> logger.debug("Listen to port: " + 9933))

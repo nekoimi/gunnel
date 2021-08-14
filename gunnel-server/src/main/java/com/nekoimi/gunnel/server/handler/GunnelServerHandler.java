@@ -1,9 +1,9 @@
 package com.nekoimi.gunnel.server.handler;
 
+import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -14,25 +14,16 @@ import lombok.extern.slf4j.Slf4j;
  * >> TODO 会有多个客户端连接过来，一个客户端就需要建立一个Server连接
  */
 @Slf4j
-public class GunnelServerHandler extends SimpleChannelInboundHandler<GunnelMessage> {
-
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.flush();
-    }
-
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
-        ctx.close();
-    }
+public class GunnelServerHandler extends GunnelMessageHandler {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, GunnelMessage msg) throws Exception {
+        log.debug("------------------------ GunnelServerHandler BEGIN ------------------------");
+
         log.debug("msg: " + msg);
 
         ByteBuf buffer = ctx.alloc().buffer();
         ctx.writeAndFlush(buffer);
+        log.debug("------------------------ GunnelServerHandler BEGIN ------------------------");
     }
 }
