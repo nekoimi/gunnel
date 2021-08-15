@@ -3,37 +3,38 @@ package com.nekoimi.gunnel.client.net;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * nekoimi  2021/8/14 20:49
  */
 public abstract class AbstractClient {
-    private final static Logger logger = LoggerFactory.getLogger(AbstractClient.class);
-    private final NioEventLoopGroup workerGroup = new NioEventLoopGroup();
-    private final Bootstrap bootstrap = new Bootstrap();
+    protected final NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+    protected final Bootstrap bootstrap = new Bootstrap();
 
-    abstract public String host();
-    abstract public int port();
-    abstract public ChannelInitializer<SocketChannel> initializer();
+    /**
+     * 连接类型
+     * Tcp: NioSocketChannel
+     * Udp: NioDatagramChannel
+     * @return
+     */
+    abstract public Class<? extends Channel> channel();
+
+    /**
+     * 连接自定义的初始化方法
+     * @return
+     */
+    abstract public ChannelInitializer<? extends Channel> initializer();
+
+    /**
+     * 具体的连接实现
+     */
+    abstract public void connect();
 
     public void start() {
-        bootstrap.group(workerGroup)
-                .channel(NioSocketChannel.class)
-                .handler(initializer())
-                .option(ChannelOption.SO_KEEPALIVE, true);
-        try {
-            Channel channel = bootstrap.connect(host(), port()).sync().channel();
-            channel.closeFuture().sync();
-        } catch (InterruptedException e) {
-            logger.error(e.getMessage());
-        } finally {
-            workerGroup.shutdownGracefully();
-        }
+        // init
+        this.bootstrap.group(workerGroup).channel(channel()).handler(initializer());
+        // start connect
+        connect();
     }
 }

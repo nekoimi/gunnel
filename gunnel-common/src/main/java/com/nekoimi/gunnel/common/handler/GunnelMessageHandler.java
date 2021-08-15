@@ -8,13 +8,18 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 
-import java.lang.Error;
-
 /**
  * nekoimi  2021/8/14 21:19
  */
 @Slf4j
 public abstract class GunnelMessageHandler extends SimpleChannelInboundHandler<GunnelMessage> {
+    private ChannelHandlerContext context;
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        this.context = ctx;
+        super.channelActive(ctx);
+    }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
@@ -38,6 +43,11 @@ public abstract class GunnelMessageHandler extends SimpleChannelInboundHandler<G
         log.debug("message content: " + msg.getMessage().toJson());
         MsgType type = msg.getType();
         Message message = msg.getMessage();
+
+        if (MsgType.GU_AUTH == type) {
+            gunnelReadAuth(ctx, (Auth) message);
+        }
+
         if (MsgType.GU_REGISTER == type) {
             gunnelReadRegister(ctx, (Register) message);
         }
@@ -59,38 +69,73 @@ public abstract class GunnelMessageHandler extends SimpleChannelInboundHandler<G
         }
 
         if (MsgType.GU_ERROR == type) {
-            gunnelReadError(ctx, (Error) message);
+            gunnelReadError(ctx, (GunnelError) message);
         }
 
         log.debug("------------------------ GunnelMessageHandler BEGIN ------------------------");
     }
 
     /**
+     * 发送认证消息
+     *
+     * @param identifier
+     * @param idKey
+     */
+    protected void sendAuth(String identifier, String idKey) {
+        context.writeAndFlush(GunnelMessage.builder().type(MsgType.GU_AUTH).message(
+                Auth.builder().identifier(identifier).idKey(idKey).build())
+                .build());
+    }
+
+    /**
+     * 发送错误消息
+     *
+     * @param code
+     */
+    protected void sendError(int code) {
+        context.writeAndFlush(GunnelMessage.builder().type(MsgType.GU_ERROR).message(
+                GunnelError.builder().code(code).build()
+        ).build());
+    }
+
+    /**
+     * 认证消息
+     *
+     * @param ctx
+     */
+    abstract protected void gunnelReadAuth(ChannelHandlerContext ctx, Auth message);
+
+    /**
      * 注册消息
+     *
      * @param ctx
      */
     abstract protected void gunnelReadRegister(ChannelHandlerContext ctx, Register message);
 
     /**
      * 连接消息
+     *
      * @param ctx
      */
     abstract protected void gunnelReadConnected(ChannelHandlerContext ctx, Connected message);
 
     /**
      * 断开连接消息
+     *
      * @param ctx
      */
     abstract protected void gunnelReadDisconnected(ChannelHandlerContext ctx, Disconnected message);
 
     /**
      * 转发数据
+     *
      * @param ctx
      */
     abstract protected void gunnelReadData(ChannelHandlerContext ctx, Data message);
 
     /**
      * 心跳
+     *
      * @param ctx
      */
     protected void gunnelReadKeepalive(ChannelHandlerContext ctx, Keepalive message) {
@@ -99,8 +144,9 @@ public abstract class GunnelMessageHandler extends SimpleChannelInboundHandler<G
 
     /**
      * 错误通知
+     *
      * @param ctx
      */
-    abstract protected void gunnelReadError(ChannelHandlerContext ctx, Error message);
+    abstract protected void gunnelReadError(ChannelHandlerContext ctx, GunnelError message);
 
 }

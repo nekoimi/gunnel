@@ -1,5 +1,6 @@
 package com.nekoimi.gunnel.common.codec;
 
+import com.nekoimi.gunnel.common.constants.SystemConstants;
 import com.nekoimi.gunnel.common.contract.Message;
 import com.nekoimi.gunnel.common.enums.MsgType;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
@@ -34,6 +35,10 @@ public class GunnelMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
         log.debug("------------------------ GunnelMessageDecoder BEGIN ------------------------");
         // 读取一个double数据 获取版本号 readerIndex + 8
         double version = msg.readDouble();
+        if (!(SystemConstants.VERSION == version)) {
+            log.warn("message version error, ignore");
+            return;
+        }
         log.debug("<<<<<<< version: " + version);
         // 读取一个int数据 获取消息类型 readerIndex + 4
         int msgTypeCode = msg.readInt();

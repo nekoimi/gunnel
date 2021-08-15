@@ -1,12 +1,7 @@
 package com.nekoimi.gunnel.client.handler;
 
-import com.nekoimi.gunnel.common.enums.MsgType;
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
-import com.nekoimi.gunnel.common.protocol.GunnelMessage;
-import com.nekoimi.gunnel.common.protocol.message.Connected;
-import com.nekoimi.gunnel.common.protocol.message.Data;
-import com.nekoimi.gunnel.common.protocol.message.Disconnected;
-import com.nekoimi.gunnel.common.protocol.message.Register;
+import com.nekoimi.gunnel.common.protocol.message.*;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,17 +13,18 @@ public class GunnelClientHandler extends GunnelMessageHandler {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        GunnelMessage.builder()
-                .type(MsgType.GU_REGISTER)
-                .message(Register.builder().port(10000).password("123456").build())
-                .build().send(ctx);
-
         super.channelActive(ctx);
+        sendAuth("10000", "123456");
+    }
+
+    @Override
+    protected void gunnelReadAuth(ChannelHandlerContext ctx, Auth message) {
+        log.debug("Auth success!");
     }
 
     @Override
     protected void gunnelReadRegister(ChannelHandlerContext ctx, Register message) {
-
+        log.debug("Register success!");
     }
 
     @Override
@@ -47,7 +43,8 @@ public class GunnelClientHandler extends GunnelMessageHandler {
     }
 
     @Override
-    protected void gunnelReadError(ChannelHandlerContext ctx, Error message) {
-
+    protected void gunnelReadError(ChannelHandlerContext ctx, GunnelError message) {
+        log.debug("-- 收到来自服务器端的错误消息 --");
+        ctx.close();
     }
 }

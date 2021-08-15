@@ -1,10 +1,8 @@
 package com.nekoimi.gunnel.server.handler;
 
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
-import com.nekoimi.gunnel.common.protocol.message.Connected;
-import com.nekoimi.gunnel.common.protocol.message.Data;
-import com.nekoimi.gunnel.common.protocol.message.Disconnected;
-import com.nekoimi.gunnel.common.protocol.message.Register;
+import com.nekoimi.gunnel.common.protocol.message.*;
+import com.nekoimi.gunnel.server.auth.ChannelAuthService;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,6 +15,18 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class GunnelServerHandler extends GunnelMessageHandler {
+    @Override
+    protected void gunnelReadAuth(ChannelHandlerContext ctx, Auth message) {
+        log.debug("-- 验证认证信息 --");
+        if (!ChannelAuthService.auth(message)) {
+            sendError(-1);
+        }
+
+        else {
+            sendAuth(null, null);
+        }
+    }
+
     @Override
     protected void gunnelReadRegister(ChannelHandlerContext ctx, Register message) {
         log.debug("Register: " + message.toJson());
@@ -38,7 +48,7 @@ public class GunnelServerHandler extends GunnelMessageHandler {
     }
 
     @Override
-    protected void gunnelReadError(ChannelHandlerContext ctx, Error message) {
+    protected void gunnelReadError(ChannelHandlerContext ctx, GunnelError message) {
 
     }
 }

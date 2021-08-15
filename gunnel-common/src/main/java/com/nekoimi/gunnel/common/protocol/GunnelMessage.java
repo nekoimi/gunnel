@@ -2,7 +2,6 @@ package com.nekoimi.gunnel.common.protocol;
 
 import com.nekoimi.gunnel.common.contract.Message;
 import com.nekoimi.gunnel.common.enums.MsgType;
-import io.netty.channel.ChannelHandlerContext;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,12 +13,4 @@ import lombok.Data;
 public class GunnelMessage {
     private MsgType type;
     private Message message;
-
-    /**
-     * send
-     * @param ctx
-     */
-    public void send(ChannelHandlerContext ctx) {
-        ctx.writeAndFlush(this);
-    }
 }
