@@ -29,17 +29,21 @@ public class GunnelMessageEncoder extends MessageToByteEncoder<GunnelMessage> {
                 ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
                 DataOutputStream dataOutput = new DataOutputStream(byteOutput);
         ) {
-            dataOutput.write(msg.getMessage().toString().getBytes(StandardCharsets.UTF_8));
+            dataOutput.write(msg.getMessage().toJson().getBytes(StandardCharsets.UTF_8));
 
             byte[] bytes = byteOutput.toByteArray();
             // 写入版本号
             out.writeDouble(SystemConstants.VERSION);
+            log.debug(">>>>>>> version: " + SystemConstants.VERSION);
             // 写入消息类型
             out.writeInt(msg.getType().getCode());
+            log.debug(">>>>>>> msgType: " + msg.getType());
             // 写入长度
             out.writeInt(bytes.length);
+            log.debug(">>>>>>> dataLength: " + bytes.length);
             // 写入数据
             out.writeBytes(bytes);
+            log.debug(">>>>>>> data: " + msg.getMessage().toJson());
         }
 
         log.debug("------------------------ GunnelMessageEncoder BEGIN ------------------------");

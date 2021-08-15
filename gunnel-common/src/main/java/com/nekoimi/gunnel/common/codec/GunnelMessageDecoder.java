@@ -1,7 +1,9 @@
 package com.nekoimi.gunnel.common.codec;
 
+import com.nekoimi.gunnel.common.contract.Message;
 import com.nekoimi.gunnel.common.enums.MsgType;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
+import com.nekoimi.gunnel.common.utils.JsonUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -30,29 +32,23 @@ public class GunnelMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         log.debug("------------------------ GunnelMessageDecoder BEGIN ------------------------");
-        log.debug("ByteBuf readerIndex: " + msg.readerIndex());
-        log.debug("ByteBuf writerIndex: " + msg.writerIndex());
-        log.debug("ByteBuf readableLength: " + msg.readableBytes());
         // 读取一个double数据 获取版本号 readerIndex + 8
         double version = msg.readDouble();
-        log.debug(">>>>>>> version: " + version);
+        log.debug("<<<<<<< version: " + version);
         // 读取一个int数据 获取消息类型 readerIndex + 4
         int msgTypeCode = msg.readInt();
-        MsgType msgType = MsgType.valueOf(msgTypeCode);
-        log.debug(">>>>>>> msgType: " + msgType);
+        MsgType type = MsgType.valueOf(msgTypeCode);
+        log.debug("<<<<<<< msgType: " + type);
         // 读取下一个int数据 获取数据长度 readerIndex + 4
         int length = msg.readInt();
-        log.debug(">>>>>>> dataLength: " + length);
+        log.debug("<<<<<<< dataLength: " + length);
         // 读取具体数据
         CharSequence data = msg.readCharSequence(length, StandardCharsets.UTF_8);
-        log.debug(">>>>>>> data: " + data);
+        log.debug("<<<<<<< data: " + data);
 
-        GunnelMessage message = GunnelMessage.builder()
-                .type(msgType)
-                .message(data.toString())
-                .build();
-
-        out.add(message);
+        Message message = JsonUtils.parse(data.toString(), type.getMessageType());
+        GunnelMessage gunnelMessage = GunnelMessage.builder().type(type).message(message).build();
+        out.add(gunnelMessage);
 
         log.debug("------------------------ GunnelMessageDecoder END ------------------------");
     }

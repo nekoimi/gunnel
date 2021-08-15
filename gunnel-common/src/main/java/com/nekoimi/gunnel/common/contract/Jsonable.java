@@ -1,5 +1,7 @@
 package com.nekoimi.gunnel.common.contract;
 
+import com.nekoimi.gunnel.common.utils.JsonUtils;
+
 /**
  * nekoimi  2021/8/15 0:00
  */
@@ -8,5 +10,7 @@ public interface Jsonable {
      * to json
      * @return
      */
-    String toJson();
+    default String toJson() {
+        return JsonUtils.toJson(this);
+    }
 }

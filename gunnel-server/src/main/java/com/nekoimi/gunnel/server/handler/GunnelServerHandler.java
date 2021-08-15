@@ -1,8 +1,10 @@
 package com.nekoimi.gunnel.server.handler;
 
-import com.nekoimi.gunnel.common.enums.MsgType;
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
-import com.nekoimi.gunnel.common.protocol.GunnelMessage;
+import com.nekoimi.gunnel.common.protocol.message.Connected;
+import com.nekoimi.gunnel.common.protocol.message.Data;
+import com.nekoimi.gunnel.common.protocol.message.Disconnected;
+import com.nekoimi.gunnel.common.protocol.message.Register;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,16 +17,28 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class GunnelServerHandler extends GunnelMessageHandler {
+    @Override
+    protected void gunnelReadRegister(ChannelHandlerContext ctx, Register message) {
+        log.debug("Register: " + message.toJson());
+    }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, GunnelMessage msg) throws Exception {
-        log.debug("------------------------ GunnelServerHandler BEGIN ------------------------");
+    protected void gunnelReadConnected(ChannelHandlerContext ctx, Connected message) {
 
-        log.debug("msg: " + msg);
+    }
 
-        GunnelMessage resultMessage = GunnelMessage.builder().message("hello client!").type(MsgType.GU_DATA).build();
+    @Override
+    protected void gunnelReadDisconnected(ChannelHandlerContext ctx, Disconnected message) {
 
-        ctx.writeAndFlush(resultMessage);
-        log.debug("------------------------ GunnelServerHandler BEGIN ------------------------");
+    }
+
+    @Override
+    protected void gunnelReadData(ChannelHandlerContext ctx, Data message) {
+
+    }
+
+    @Override
+    protected void gunnelReadError(ChannelHandlerContext ctx, Error message) {
+
     }
 }
