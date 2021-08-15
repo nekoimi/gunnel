@@ -8,6 +8,7 @@ import com.nekoimi.gunnel.common.protocol.message.Auth;
 public class ChannelAuthService {
 
     public static boolean auth(Auth auth) {
-        return false;
+        // TODO
+        return true;
     }
 }
