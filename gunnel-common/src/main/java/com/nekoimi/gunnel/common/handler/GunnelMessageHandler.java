@@ -4,6 +4,7 @@ import com.nekoimi.gunnel.common.contract.Message;
 import com.nekoimi.gunnel.common.enums.MsgType;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import com.nekoimi.gunnel.common.protocol.message.*;
+import com.nekoimi.gunnel.common.utils.MessageSender;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ public abstract class GunnelMessageHandler extends SimpleChannelInboundHandler<G
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         this.context = ctx;
+        MessageSender.setContext(ctx);
         super.channelActive(ctx);
     }
 
@@ -34,6 +36,12 @@ public abstract class GunnelMessageHandler extends SimpleChannelInboundHandler<G
         cause.printStackTrace();
 
         ctx.close();
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        super.userEventTriggered(ctx, evt);
+        // 自定义空闲时间处理
     }
 
     @Override
@@ -73,29 +81,6 @@ public abstract class GunnelMessageHandler extends SimpleChannelInboundHandler<G
         }
 
         log.debug("------------------------ GunnelMessageHandler BEGIN ------------------------");
-    }
-
-    /**
-     * 发送认证消息
-     *
-     * @param identifier
-     * @param idKey
-     */
-    protected void sendAuth(String identifier, String idKey) {
-        context.writeAndFlush(GunnelMessage.builder().type(MsgType.GU_AUTH).message(
-                Auth.builder().identifier(identifier).idKey(idKey).build())
-                .build());
-    }
-
-    /**
-     * 发送错误消息
-     *
-     * @param code
-     */
-    protected void sendError(int code) {
-        context.writeAndFlush(GunnelMessage.builder().type(MsgType.GU_ERROR).message(
-                GunnelError.builder().code(code).build()
-        ).build());
     }
 
     /**

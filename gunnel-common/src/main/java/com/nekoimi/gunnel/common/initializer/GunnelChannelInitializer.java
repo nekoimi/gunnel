@@ -24,7 +24,7 @@ public abstract class GunnelChannelInitializer extends ChannelInitializer<Socket
          * >> TODO 这样解码之后 ByteBuf 里面就包含全部的数据 => 版本号 + 消息类型 + 长度 + 数据
          */
         pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 12, 4, 0, 0));
-        // Idle 心跳监测机制
+        // Idle 空闲时间处理机制
         pipeline.addLast(new IdleStateHandler(60, 30, 0));
         // 自定义协议编码解码器
         pipeline.addLast(new GunnelMessageDecoder());
