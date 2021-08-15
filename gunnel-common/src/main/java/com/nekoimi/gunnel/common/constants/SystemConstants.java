@@ -5,5 +5,4 @@ package com.nekoimi.gunnel.common.constants;
  */
 public interface SystemConstants {
     double VERSION = 1.0;
-    int SERVER_PORT = 9933;
 }

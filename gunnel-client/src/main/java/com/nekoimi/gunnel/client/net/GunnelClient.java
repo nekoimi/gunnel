@@ -1,6 +1,8 @@
 package com.nekoimi.gunnel.client.net;
 
 import com.nekoimi.gunnel.client.initializer.GunnelClientInitializer;
+import com.nekoimi.gunnel.common.config.ClientProperties;
+import com.nekoimi.gunnel.common.config.GunnelConfigParser;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -18,11 +20,12 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class GunnelClient extends AbstractClient {
-    public String host() {
-        return "192.168.3.3";
-    }
-    public int port() {
-        return 9933;
+    private final String host;
+    private final int port;
+
+    public GunnelClient(String host, int port) {
+        this.host = host;
+        this.port = port;
     }
 
     @Override
@@ -39,7 +42,7 @@ public class GunnelClient extends AbstractClient {
     public void connect() {
         try {
             bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
-            Channel channel = bootstrap.connect(host(), port()).sync().channel();
+            Channel channel = bootstrap.connect(host, port).sync().channel();
             channel.closeFuture().addListener(future -> closeReconnectListener()).sync();
         } catch (InterruptedException e) {
             log.error(e.getMessage());
@@ -48,10 +51,10 @@ public class GunnelClient extends AbstractClient {
 
     public void closeReconnectListener() {
         // 断线重连
-        new Thread(new RetryConnect()).start();
+        new Thread(new GunnelClientRetryReconnect()).start();
     }
 
-    public final class RetryConnect implements Runnable {
+    public final class GunnelClientRetryReconnect implements Runnable {
         @Override
         public void run() {
             try {
@@ -74,5 +77,14 @@ public class GunnelClient extends AbstractClient {
                 }
             }
         }
+    }
+
+    /**
+     * Run
+     * @param args
+     */
+    public static void run(String...args) {
+        ClientProperties.Server server = GunnelConfigParser.getClient().getServer();
+        new GunnelClient(server.getAddress(), server.getPort()).start();
     }
 }

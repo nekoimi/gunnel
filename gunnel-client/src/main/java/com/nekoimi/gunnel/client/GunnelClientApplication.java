@@ -8,6 +8,6 @@ import com.nekoimi.gunnel.client.net.GunnelClient;
 public class GunnelClientApplication {
 
     public static void main(String[] args) {
-        new GunnelClient().start();
+        GunnelClient.run(args);
     }
 }

@@ -1,0 +1,4 @@
+gunnel:
+  server:
+    address: 192.168.3.3
+    port: 9933
