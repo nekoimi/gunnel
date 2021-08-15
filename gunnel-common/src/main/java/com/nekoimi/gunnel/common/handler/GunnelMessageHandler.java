@@ -4,7 +4,6 @@ import com.nekoimi.gunnel.common.contract.Message;
 import com.nekoimi.gunnel.common.enums.MsgType;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import com.nekoimi.gunnel.common.protocol.message.*;
-import com.nekoimi.gunnel.common.utils.MessageSender;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -14,14 +13,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class GunnelMessageHandler extends SimpleChannelInboundHandler<GunnelMessage> {
-    private ChannelHandlerContext context;
-
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        this.context = ctx;
-        MessageSender.setContext(ctx);
-        super.channelActive(ctx);
-    }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {

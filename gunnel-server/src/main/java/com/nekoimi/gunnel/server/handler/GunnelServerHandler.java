@@ -2,13 +2,12 @@ package com.nekoimi.gunnel.server.handler;
 
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
 import com.nekoimi.gunnel.common.protocol.message.*;
-import com.nekoimi.gunnel.common.utils.MessageSender;
 import com.nekoimi.gunnel.server.auth.ChannelAuthService;
+import com.nekoimi.gunnel.common.context.GunnelContext;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * nekoimi  2021/8/14 16:50
@@ -19,19 +18,38 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class GunnelServerHandler extends GunnelMessageHandler {
-    // channel group for proxy channel
-    private static final ChannelGroup proxyChannelGroup = new DefaultChannelGroup("ProxyChannelGroup", GlobalEventExecutor.INSTANCE);
+    protected final GunnelContext context;
+    public GunnelServerHandler(GunnelContext context) {
+        this.context = context;
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        log.debug("ctx: " + ctx);
+        super.channelActive(ctx);
+    }
 
     @Override
     protected void gunnelReadAuth(ChannelHandlerContext ctx, Auth message) {
         log.debug("-- 验证认证信息 --");
         if (!ChannelAuthService.auth(message)) {
-            MessageSender.error(-1);
+            context.sender().error(-1);
         }
 
         else {
-            MessageSender.auth();
+            context.sender().auth();
         }
+
+        new Thread(() -> {
+            while (true) {
+                try {
+                    context.sender().auth();
+                    TimeUnit.SECONDS.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     @Override

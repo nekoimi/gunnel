@@ -3,6 +3,7 @@ package com.nekoimi.gunnel.client.net;
 import com.nekoimi.gunnel.client.initializer.GunnelClientInitializer;
 import com.nekoimi.gunnel.common.config.ClientProperties;
 import com.nekoimi.gunnel.common.config.GunnelConfigParser;
+import com.nekoimi.gunnel.common.context.GunnelContext;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -20,6 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class GunnelClient extends AbstractClient {
+    private final GunnelContext context = new GunnelContext();
     private final String host;
     private final int port;
 
@@ -35,7 +37,7 @@ public class GunnelClient extends AbstractClient {
 
     @Override
     public ChannelInitializer<SocketChannel> initializer() {
-        return new GunnelClientInitializer();
+        return new GunnelClientInitializer(context);
     }
 
     @Override

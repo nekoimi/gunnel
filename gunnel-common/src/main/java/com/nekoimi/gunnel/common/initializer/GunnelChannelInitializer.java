@@ -2,6 +2,7 @@ package com.nekoimi.gunnel.common.initializer;
 
 import com.nekoimi.gunnel.common.codec.GunnelMessageDecoder;
 import com.nekoimi.gunnel.common.codec.GunnelMessageEncoder;
+import com.nekoimi.gunnel.common.context.GunnelContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -12,6 +13,11 @@ import io.netty.handler.timeout.IdleStateHandler;
  * nekoimi  2021/8/14 21:02
  */
 public abstract class GunnelChannelInitializer extends ChannelInitializer<SocketChannel> {
+    protected final GunnelContext context;
+    public GunnelChannelInitializer(GunnelContext context) {
+        this.context = context;
+    }
+
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();

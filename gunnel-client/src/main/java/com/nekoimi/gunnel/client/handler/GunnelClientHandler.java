@@ -3,7 +3,6 @@ package com.nekoimi.gunnel.client.handler;
 import com.nekoimi.gunnel.common.config.GunnelConfigParser;
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
 import com.nekoimi.gunnel.common.protocol.message.*;
-import com.nekoimi.gunnel.common.utils.MessageSender;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,14 +15,13 @@ public class GunnelClientHandler extends GunnelMessageHandler {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-        MessageSender.auth(GunnelConfigParser.getClient().getId());
+         context.sender().auth(GunnelConfigParser.getClient().getId());
     }
 
     @Override
     protected void gunnelReadAuth(ChannelHandlerContext ctx, Auth message) {
         log.debug("Auth success!");
         // TODO 发送代理注册消息，将本地需要暴露的服务信息传送给服务器
-
     }
 
     @Override
