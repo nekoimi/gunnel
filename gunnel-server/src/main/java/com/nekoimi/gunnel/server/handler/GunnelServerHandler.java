@@ -2,12 +2,13 @@ package com.nekoimi.gunnel.server.handler;
 
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
 import com.nekoimi.gunnel.common.protocol.message.*;
+import com.nekoimi.gunnel.common.utils.MessageUtils;
 import com.nekoimi.gunnel.server.auth.ChannelAuthService;
-import com.nekoimi.gunnel.common.context.GunnelContext;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * nekoimi  2021/8/14 16:50
@@ -18,10 +19,14 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class GunnelServerHandler extends GunnelMessageHandler {
-    protected final GunnelContext context;
-    public GunnelServerHandler(GunnelContext context) {
-        this.context = context;
-    }
+    /**
+     * channel group for proxy channel
+     * <p>
+     * 把对外暴露内网的连接单独分组
+     * <p>
+     * 使用ChannelGroup可以在channel关闭时自动移除channel
+     */
+    private final ChannelGroup proxyChannels = new DefaultChannelGroup("ProxyChannelGroup", GlobalEventExecutor.INSTANCE);
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -33,23 +38,14 @@ public class GunnelServerHandler extends GunnelMessageHandler {
     protected void gunnelReadAuth(ChannelHandlerContext ctx, Auth message) {
         log.debug("-- 验证认证信息 --");
         if (!ChannelAuthService.auth(message)) {
-            context.sender().error(-1);
+            MessageUtils.senError(ctx, -1);
         }
 
+        // TODO 这里暂时没有过多操作
+        // TODO 直接给一个空的 auth 消息表示回应
         else {
-            context.sender().auth();
+            MessageUtils.sendAuthAsk(ctx);
         }
-
-        new Thread(() -> {
-            while (true) {
-                try {
-                    context.sender().auth();
-                    TimeUnit.SECONDS.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
     }
 
     @Override
