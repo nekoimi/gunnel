@@ -5,8 +5,6 @@ package com.nekoimi.gunnel.common.enums;
  */
 public enum Protocol {
     TCP,
-    UDP,
     WEBSOCKET,
-    HTTP,
-    HTTPS
+    HTTP
 }

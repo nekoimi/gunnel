@@ -7,7 +7,7 @@ gunnel:
     address: 192.168.3.3
     port: 9933
   proxy:
-    - type: TCP
-      localIp: 192.168.3.3
-      localPort: 9919
-      remotePort: 10000
+    tcp:
+      - localIp: 192.168.3.3
+        localPort: 9919
+        remotePort: 10000

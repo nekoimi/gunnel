@@ -1,6 +1,7 @@
 package com.nekoimi.gunnel.common.protocol.message;
 
 import com.nekoimi.gunnel.common.contract.Message;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 /**
@@ -8,5 +9,8 @@ import lombok.Builder;
  */
 @lombok.Data
 @Builder
+@AllArgsConstructor
 public class Data implements Message {
+    private String channelId;
+    private byte[] data;
 }

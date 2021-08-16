@@ -64,7 +64,7 @@ public class GunnelClient extends AbstractClient {
             }
             while (true) {
                 try {
-                    log.info("try reconnect......");
+                    log.info("Try to reconnect to the server......");
                     connect();
                     break;
                 } catch (Exception var1) {

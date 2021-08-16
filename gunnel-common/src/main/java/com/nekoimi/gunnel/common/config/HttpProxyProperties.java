@@ -1,6 +1,5 @@
 package com.nekoimi.gunnel.common.config;
 
-import com.nekoimi.gunnel.common.enums.Protocol;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,9 +10,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ProxyProperties {
-    private Protocol type;
+public class HttpProxyProperties {
     private String localIp;
     private int localPort;
-    private int remotePort;
+    private String remoteDomain;
 }

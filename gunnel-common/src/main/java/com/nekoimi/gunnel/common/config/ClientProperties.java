@@ -18,7 +18,7 @@ public class ClientProperties {
     private Protocol protocol;
     private Server server;
     private ID id;
-    private List<ProxyProperties> proxy = new LinkedList<>();
+    private Proxy proxy;
 
     @Getter
     @Setter
@@ -34,5 +34,13 @@ public class ClientProperties {
     public static class ID {
         private String identifier;
         private String key;
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class Proxy {
+        private List<TcpProxyProperties> tcp = new LinkedList<>();
+        private List<HttpProxyProperties> http = new LinkedList<>();
     }
 }
