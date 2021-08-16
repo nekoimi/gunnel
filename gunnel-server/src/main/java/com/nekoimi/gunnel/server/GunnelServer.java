@@ -1,16 +1,15 @@
-package com.nekoimi.gunnel.server.net;
+package com.nekoimi.gunnel.server;
 
 import com.nekoimi.gunnel.common.config.GunnelConfigParser;
 import com.nekoimi.gunnel.server.initializer.GunnelServerInitializer;
+import com.nekoimi.gunnel.server.net.AbstractServer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * nekoimi  2021/8/14 17:33
- *
- * Gunnel 服务端
+ * nekoimi  2021/8/13 20:52
  */
 @Slf4j
 public class GunnelServer extends AbstractServer {
@@ -38,11 +37,7 @@ public class GunnelServer extends AbstractServer {
         }
     }
 
-    /**
-     * Run
-     * @param args
-     */
-    public static void run(String...args) {
+    public static void main(String[] args) {
         int port = GunnelConfigParser.getServer().getPort();
         new GunnelServer(port).start();
     }
