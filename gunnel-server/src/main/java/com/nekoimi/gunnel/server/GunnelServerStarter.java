@@ -21,17 +21,14 @@ public class GunnelServerStarter {
 
     public void run() {
         context.bindEventLoop(masterLoop, workerLoop);
-        container.register(new GunnelConfigApplication("GunnelServerConfigApp", context));
-        container.register(new GunnelUdpServer("GunnelUdpServerApp", context));
-        container.register(new GunnelTcpServer("GunnelTcpServerApp", context));
-        container.runAll();
         try {
-            context.tcpFuture().sync();
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
+            container.register(new GunnelConfigApplication("GunnelServerConfigApp", context));
+            container.register(new GunnelUdpServer("GunnelUdpServerApp", context));
+            container.register(new GunnelTcpServer("GunnelTcpServerApp", context));
+            container.runAll();
+            context.waitGroup();
         } finally {
-            workerLoop.shutdownGracefully();
-            masterLoop.shutdownGracefully();
+            context.forceShutdown();
         }
     }
 

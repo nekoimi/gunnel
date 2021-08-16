@@ -3,14 +3,16 @@ package com.nekoimi.gunnel.server.context;
 import com.nekoimi.gunnel.server.config.ServerProperties;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * nekoimi  2021/8/16 21:55
  */
+@Slf4j
 public class GunnelContext {
     private EventLoopGroup masterLoop;
     private EventLoopGroup workerLoop;
-    private ChannelFuture tcpFuture;
+    private ChannelFuture future;
     private ServerProperties properties;
 
     public void bindEventLoop(EventLoopGroup masterLoop, EventLoopGroup workerLoop) {
@@ -18,19 +20,38 @@ public class GunnelContext {
         this.workerLoop = workerLoop;
     }
 
-    public void bindTcpFuture(ChannelFuture future) {
-        this.tcpFuture = future;
+    public void bindFuture(ChannelFuture future) {
+        this.future = future;
     }
 
     public void setProperties(ServerProperties properties) {
         this.properties = properties;
     }
 
-    public ChannelFuture tcpFuture() {
-        return tcpFuture;
+    public ChannelFuture future() {
+        return future;
     }
 
     public ServerProperties properties() {
         return properties;
+    }
+
+    public void waitGroup() {
+        try {
+            future().sync();
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+        } finally {
+            forceShutdown();
+        }
+    }
+
+    public void forceShutdown() {
+        if (!workerLoop.isShutdown()) {
+            workerLoop.shutdownGracefully();
+        }
+        if (!masterLoop.isShutdown()) {
+            masterLoop.shutdownGracefully();
+        }
     }
 }
