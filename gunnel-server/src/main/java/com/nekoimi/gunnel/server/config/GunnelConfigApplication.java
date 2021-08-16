@@ -33,15 +33,12 @@ public class GunnelConfigApplication extends AbstractGunnelApplication {
     public void restart() {
         loadServerPropertiesByYaml();
         context.setProperties(serverProperties);
+        super.restart();
     }
 
     @Override
     public void shutdown() {
+        super.shutdown();
         context.setProperties(null);
-    }
-
-    @Override
-    public void run() {
-        // TODO Ignore...
     }
 }

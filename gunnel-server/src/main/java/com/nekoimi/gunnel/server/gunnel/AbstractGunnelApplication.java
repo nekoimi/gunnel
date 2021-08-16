@@ -25,4 +25,19 @@ public abstract class AbstractGunnelApplication implements GunnelApplication {
     public GunnelContext context() {
         return context;
     }
+
+    @Override
+    public void restart() {
+
+    }
+
+    @Override
+    public void shutdown() {
+
+    }
+
+    @Override
+    public void run() {
+        // TODO
+    }
 }

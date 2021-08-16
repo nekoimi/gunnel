@@ -10,7 +10,7 @@ import java.util.List;
  * nekoimi  2021/8/16 22:08
  */
 @Slf4j
-public class AppContainer {
+public class GunnelContainer {
     private final List<GunnelApplication> applications = new LinkedList<>();
 
     public void register(GunnelApplication app) {
@@ -19,7 +19,6 @@ public class AppContainer {
 
     public void runAll() {
         for (GunnelApplication app : applications) {
-            log.info("App " + app.name() + " starting......");
             app.start();
         }
     }
