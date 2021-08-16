@@ -1,4 +1,4 @@
-package com.nekoimi.gunnel.common.contract;
+package com.nekoimi.gunnel.server.contract;
 
 /**
  * nekoimi  2021/8/16 21:04

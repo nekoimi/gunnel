@@ -33,8 +33,8 @@ public class GunnelMessageEncoder extends MessageToByteEncoder<GunnelMessage> {
 
             byte[] bytes = byteOutput.toByteArray();
             // 写入版本号
-            out.writeDouble(SystemConstants.VERSION);
-            log.debug(">>>>>>> version: " + SystemConstants.VERSION);
+            out.writeDouble(SystemConstants.PROTOCOL_VERSION);
+            log.debug(">>>>>>> version: " + SystemConstants.PROTOCOL_VERSION);
             // 写入消息类型
             out.writeInt(msg.getType().getCode());
             log.debug(">>>>>>> msgType: " + msg.getType());

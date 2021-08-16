@@ -1,44 +1,34 @@
 package com.nekoimi.gunnel.server;
 
-import com.nekoimi.gunnel.common.config.GunnelConfigParser;
-import com.nekoimi.gunnel.server.initializer.GunnelServerInitializer;
-import com.nekoimi.gunnel.server.net.AbstractServer;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
+import com.nekoimi.gunnel.server.config.GunnelConfigApplication;
+import com.nekoimi.gunnel.server.gunnel.AppContainer;
+import com.nekoimi.gunnel.server.context.GunnelContext;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * nekoimi  2021/8/13 20:52
  */
 @Slf4j
-public class GunnelServer extends AbstractServer {
-    private final int port;
+public class GunnelServer {
+    private static final GunnelContext context = new GunnelContext();
+    private final EventLoopGroup masterLoop = new NioEventLoopGroup(1);
+    private final EventLoopGroup workerLoop = new NioEventLoopGroup();
+    private final AppContainer container = new AppContainer();
 
-    public GunnelServer(int port) {
-        this.port = port;
+    // Run all proxy
+    private void runAllProxy() {
+        context.bindEventLoop(masterLoop, workerLoop);
+        container.register(new GunnelConfigApplication("gunnel-server-config", context));
+        container.runAll();
     }
 
-    @Override
-    public ChannelInitializer<SocketChannel> initializer() {
-        return new GunnelServerInitializer();
-    }
-
-    @Override
-    protected void bind() {
-        try {
-            Channel channel = bootstrap.bind(port)
-                    .addListener(future -> log.debug("GunnelServer running on " + port)).sync().channel();
-            channel.closeFuture().sync();
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
-        } finally {
-            forceShutdown();
-        }
+    // Run
+    public void run() {
+        new GunnelServer();
     }
 
     public static void main(String[] args) {
-        int port = GunnelConfigParser.getServer().getPort();
-        new GunnelServer(port).start();
     }
 }

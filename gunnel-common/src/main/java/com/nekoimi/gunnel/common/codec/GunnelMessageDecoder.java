@@ -35,7 +35,7 @@ public class GunnelMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
         log.debug("------------------------ GunnelMessageDecoder BEGIN ------------------------");
         // 读取一个double数据 获取版本号 readerIndex + 8
         double version = msg.readDouble();
-        if (!(SystemConstants.VERSION == version)) {
+        if (!(SystemConstants.PROTOCOL_VERSION == version)) {
             log.warn("message version error, ignore");
             return;
         }
