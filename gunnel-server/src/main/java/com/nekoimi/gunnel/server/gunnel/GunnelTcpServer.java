@@ -4,6 +4,7 @@ import com.nekoimi.gunnel.common.codec.GunnelMessageDecoder;
 import com.nekoimi.gunnel.common.codec.GunnelMessageEncoder;
 import com.nekoimi.gunnel.server.context.GunnelContext;
 import com.nekoimi.gunnel.server.handler.GunnelServerHandler;
+import com.nekoimi.gunnel.server.handler.ServerIdleCheckHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -13,7 +14,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
@@ -32,7 +32,7 @@ public class GunnelTcpServer extends AbstractGunnelApplication {
                 .channel(NioServerSocketChannel.class)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .handler(new LoggingHandler())
-                .childHandler(new GunnelTcpServerInitializer());
+                .childHandler(new GunnelTcpServerInitializer(context()));
     }
 
     @Override
@@ -86,10 +86,16 @@ public class GunnelTcpServer extends AbstractGunnelApplication {
     }
 
     private final static class GunnelTcpServerInitializer extends ChannelInitializer<SocketChannel> {
+        private GunnelContext context;
+        public GunnelTcpServerInitializer(GunnelContext context) {
+            this.context = context;
+        }
 
         @Override
         protected void initChannel(SocketChannel ch) throws Exception {
             ChannelPipeline pipeline = ch.pipeline();
+            // Idle 空闲时间处理机制
+            pipeline.addLast(new ServerIdleCheckHandler(context.properties().getIdleCheck().getReaderTime()));
             /**
              * Netty的TCP分包处理器
              * >> TODO 粘包、半包初始配置，根据自定义的协议
@@ -99,8 +105,6 @@ public class GunnelTcpServer extends AbstractGunnelApplication {
              * >> TODO 这样解码之后 ByteBuf 里面就包含全部的数据 => 版本号 + 消息类型 + 长度 + 数据
              */
             pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 12, 4, 0, 0));
-            // Idle 空闲时间处理机制
-            pipeline.addLast(new IdleStateHandler(60, 30, 0));
             // 自定义协议编码解码器
             pipeline.addLast(new GunnelMessageDecoder());
             pipeline.addLast(new GunnelMessageEncoder());

@@ -20,19 +20,12 @@ public abstract class GunnelMessageHandler extends SimpleChannelInboundHandler<G
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-//        super.exceptionCaught(ctx, cause);
-        log.error(cause.getMessage());
-        log.error(ctx.channel().toString());
-        cause.printStackTrace();
-
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable e) throws Exception {
+        log.error(e.getMessage());
+        if (log.isDebugEnabled()) {
+            e.printStackTrace();
+        }
         ctx.close();
-    }
-
-    @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        super.userEventTriggered(ctx, evt);
-        // 自定义空闲时间处理
     }
 
     @Override

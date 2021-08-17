@@ -12,4 +12,12 @@ import lombok.ToString;
 @ToString
 public class ServerProperties {
     private int port = 9933;
+    private IdleCheck idleCheck;
+
+    @Getter
+    @Setter
+    @ToString
+    public static class IdleCheck {
+        private long readerTime = 60;
+    }
 }
