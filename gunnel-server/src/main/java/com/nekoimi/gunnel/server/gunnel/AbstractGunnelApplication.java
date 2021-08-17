@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class AbstractGunnelApplication implements GunnelApplication {
-    protected final String name;
-    protected final GunnelContext context;
+    private final String name;
+    private final GunnelContext context;
     public AbstractGunnelApplication(String name, GunnelContext context) {
         this.name = name;
         this.context = context;
@@ -28,16 +28,16 @@ public abstract class AbstractGunnelApplication implements GunnelApplication {
 
     @Override
     public void restart() {
-
+        // TODO
     }
 
     @Override
     public void shutdown() {
-
+        context.latch().countDown();
     }
 
     @Override
     public void run() {
-        // TODO
+        start();
     }
 }

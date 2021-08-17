@@ -5,15 +5,22 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * nekoimi  2021/8/16 21:55
  */
 @Slf4j
 public class GunnelContext {
+    private CountDownLatch latch;
     private EventLoopGroup masterLoop;
     private EventLoopGroup workerLoop;
     private ChannelFuture future;
     private ServerProperties properties;
+
+    public void bindLatch(CountDownLatch latch) {
+        this.latch = latch;
+    }
 
     public void bindEventLoop(EventLoopGroup masterLoop, EventLoopGroup workerLoop) {
         this.masterLoop = masterLoop;
@@ -28,6 +35,18 @@ public class GunnelContext {
         this.properties = properties;
     }
 
+    public CountDownLatch latch() {
+        return latch;
+    }
+
+    public EventLoopGroup masterLoop() {
+        return masterLoop;
+    }
+
+    public EventLoopGroup workerLoop() {
+        return workerLoop;
+    }
+
     public ChannelFuture future() {
         return future;
     }
@@ -36,22 +55,12 @@ public class GunnelContext {
         return properties;
     }
 
-    public void waitGroup() {
-        try {
-            future().sync();
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
-        } finally {
-            forceShutdown();
-        }
-    }
-
     public void forceShutdown() {
-        if (!workerLoop.isShutdown()) {
-            workerLoop.shutdownGracefully();
-        }
         if (!masterLoop.isShutdown()) {
             masterLoop.shutdownGracefully();
+        }
+        if (!workerLoop.isShutdown()) {
+            workerLoop.shutdownGracefully();
         }
     }
 }

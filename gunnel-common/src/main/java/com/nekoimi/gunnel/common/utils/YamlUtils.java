@@ -25,7 +25,7 @@ public class YamlUtils {
             Map<String, Object> map = yaml.loadAs(inputStream, Map.class);
             return map;
         } catch (IOException e) {
-            log.error("Load yaml (" + name + ") error, " + e.getMessage());
+            log.error("Load yaml ( {} ) error, {}", name, e.getMessage());
         }
         return null;
     }

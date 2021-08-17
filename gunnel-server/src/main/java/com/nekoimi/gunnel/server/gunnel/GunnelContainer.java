@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * nekoimi  2021/8/16 22:08
@@ -17,9 +18,17 @@ public class GunnelContainer {
         applications.add(app);
     }
 
-    public void runAll() {
+    public CountDownLatch runAll() {
         for (GunnelApplication app : applications) {
+            log.debug(app.name() + " starting...");
             app.start();
+        }
+        return new CountDownLatch(applications.size());
+    }
+
+    public void shutdownAll() {
+        for (GunnelApplication app : applications) {
+            app.shutdown();
         }
     }
 }

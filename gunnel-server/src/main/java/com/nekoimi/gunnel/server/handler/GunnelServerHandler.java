@@ -87,8 +87,6 @@ public class GunnelServerHandler extends GunnelMessageHandler {
     @Override
     protected void gunnelReadConnected(ChannelHandlerContext ctx, Connected message) {
         log.debug("master channel id: " + ctx.channel().id().asShortText());
-
-
     }
 
     @Override

@@ -11,34 +11,35 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class GunnelConfigApplication extends AbstractGunnelApplication {
-    private ServerProperties serverProperties;
+    private ServerProperties serverProperties = new ServerProperties();
     public GunnelConfigApplication(String name, GunnelContext context) {
         super(name, context);
     }
 
     private void loadServerPropertiesByYaml() {
-        serverProperties = YamlUtils.loadAsType(SystemConstants.DEFAULT_CONFIG, SystemConstants.APPLICATION_NAME, ServerProperties.class);
-        if (serverProperties == null) {
-            log.error("Load server config error!");
+        try {
+            serverProperties = YamlUtils.loadAsType(SystemConstants.DEFAULT_CONFIG, SystemConstants.APPLICATION_NAME, ServerProperties.class);
+        } catch (Exception e) {
+            log.error("Load server config error! {}", e.getMessage());
         }
     }
 
     @Override
     public void start() {
         loadServerPropertiesByYaml();
-        context.setProperties(serverProperties);
+        context().setProperties(serverProperties);
     }
 
     @Override
     public void restart() {
         loadServerPropertiesByYaml();
-        context.setProperties(serverProperties);
+        context().setProperties(serverProperties);
         super.restart();
     }
 
     @Override
     public void shutdown() {
         super.shutdown();
-        context.setProperties(null);
+        context().setProperties(null);
     }
 }
