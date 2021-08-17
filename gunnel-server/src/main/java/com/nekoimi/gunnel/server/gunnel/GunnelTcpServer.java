@@ -37,11 +37,18 @@ public class GunnelTcpServer extends AbstractGunnelApplication {
 
     @Override
     public void start() {
-        channel = bootstrap.bind(context().properties().getPort()).addListener(future -> {
-            log.info("{} listen port {}......", name(), context().properties().getPort());
-        }).channel();
+        channel = bootstrap.bind(context().properties().getPort())
+                .addListener(future -> {
+                    if (future.isSuccess()) {
+                        log.info("{} start success! listening on port {}", name(), context().properties().getPort());
+                    } else {
+                        log.error("{} start on {} failed! {}", name(), context().properties().getPort(), future.cause().getMessage());
+                    }
+                })
+                .channel();
         channel.closeFuture().addListener(future -> {
-            log.info("{} channel close......", name());
+            log.debug("{} channel close...", name());
+            shutdown();
         });
     }
 
@@ -49,14 +56,20 @@ public class GunnelTcpServer extends AbstractGunnelApplication {
     public void restart() {
         context().masterLoop().execute(() -> {
             do {
-                log.info("尝试重启 {}......", name());
+                log.info("try restarting the {}...", name());
                 channel.close();
                 try {
                     TimeUnit.SECONDS.sleep(5);
                     start();
+                    log.info("restart {} success!", name());
                     break;
                 } catch (InterruptedException e) {
-                    log.error("{} 重启失败, {}", name(), e.getMessage());
+                    log.error("{} restart failed, {}", name(), e.getMessage());
+                    try {
+                        TimeUnit.SECONDS.sleep(10);
+                    } catch (InterruptedException var1) {
+                        log.error(var1.getMessage());
+                    }
                 }
             } while (true);
         });
@@ -65,7 +78,10 @@ public class GunnelTcpServer extends AbstractGunnelApplication {
 
     @Override
     public void shutdown() {
-        channel.close();
+        log.info("{} shutdown...", name());
+        if (channel != null && channel.isOpen()) {
+            channel.close();
+        }
         super.shutdown();
     }
 
