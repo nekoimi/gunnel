@@ -1,6 +1,5 @@
 package com.nekoimi.gunnel.common.protocol.message;
 
-import com.nekoimi.gunnel.common.contract.Message;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,6 +8,6 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class GunnelError implements Message {
+public class GuError {
     private int code;
 }

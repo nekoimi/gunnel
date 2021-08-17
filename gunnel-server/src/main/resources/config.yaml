@@ -1,4 +1,4 @@
 gunnel:
   port: 9933
   idleCheck:
-    readerTime: 10
+    readerTime: 60

@@ -1,8 +1,7 @@
 package com.nekoimi.gunnel.common.codec;
 
 import com.nekoimi.gunnel.common.constants.SystemConstants;
-import com.nekoimi.gunnel.common.contract.Message;
-import com.nekoimi.gunnel.common.enums.MsgType;
+import com.nekoimi.gunnel.common.enums.EMessage;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import com.nekoimi.gunnel.common.utils.JsonUtils;
 import io.netty.buffer.ByteBuf;
@@ -42,8 +41,8 @@ public class GunnelMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
         log.debug("<<<<<<< version: " + version);
         // 读取一个int数据 获取消息类型 readerIndex + 4
         int msgTypeCode = msg.readInt();
-        MsgType type = MsgType.valueOf(msgTypeCode);
-        log.debug("<<<<<<< msgType: " + type);
+        EMessage eMessage = EMessage.valueOf(msgTypeCode);
+        log.debug("<<<<<<< msgType: " + eMessage);
         // 读取下一个int数据 获取数据长度 readerIndex + 4
         int length = msg.readInt();
         log.debug("<<<<<<< dataLength: " + length);
@@ -51,9 +50,9 @@ public class GunnelMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
         CharSequence data = msg.readCharSequence(length, StandardCharsets.UTF_8);
         log.debug("<<<<<<< data: " + data);
 
-        Message message = JsonUtils.parse(data.toString(), type.getMessageType());
-        GunnelMessage gunnelMessage = GunnelMessage.builder().type(type).message(message).build();
-        out.add(gunnelMessage);
+        Object message = JsonUtils.parse(data.toString(), eMessage.getType());
+
+        out.add(new GunnelMessage(eMessage, message));
 
         log.debug("------------------------ GunnelMessageDecoder END ------------------------");
     }

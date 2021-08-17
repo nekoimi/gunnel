@@ -1,6 +1,6 @@
 package com.nekoimi.gunnel.common.config;
 
-import com.nekoimi.gunnel.common.enums.Protocol;
+import com.nekoimi.gunnel.common.enums.EProtocol;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @ToString
 public class ClientProperties {
-    private Protocol protocol;
+    private EProtocol EProtocol;
     private Server server;
     private ID id;
     private Proxy proxy;

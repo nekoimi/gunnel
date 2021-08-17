@@ -86,7 +86,7 @@ public class GunnelTcpServer extends AbstractGunnelApplication {
     }
 
     private final static class GunnelTcpServerInitializer extends ChannelInitializer<SocketChannel> {
-        private GunnelContext context;
+        private final GunnelContext context;
         public GunnelTcpServerInitializer(GunnelContext context) {
             this.context = context;
         }
@@ -109,7 +109,7 @@ public class GunnelTcpServer extends AbstractGunnelApplication {
             pipeline.addLast(new GunnelMessageDecoder());
             pipeline.addLast(new GunnelMessageEncoder());
             // Gunnel Server 逻辑实现处理
-            pipeline.addLast(new GunnelServerHandler());
+            pipeline.addLast(new GunnelServerHandler(context, ch.id()));
         }
     }
 }

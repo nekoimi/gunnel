@@ -1,7 +1,6 @@
 package com.nekoimi.gunnel.server.net.proxy;
 
 import com.nekoimi.gunnel.server.handler.GunnelServerHandler;
-import com.nekoimi.gunnel.server.handler.ProxyServerHandler;
 import com.nekoimi.gunnel.server.net.AbstractServer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -32,9 +31,8 @@ public class TcpServer extends AbstractServer {
                 ChannelPipeline pipeline = ch.pipeline();
                 pipeline.addLast(new ByteArrayDecoder());
                 pipeline.addLast(new ByteArrayEncoder());
-                pipeline.addLast(new ProxyServerHandler(masterHandler));
+//                pipeline.addLast(new ProxyServerHandler(masterHandler));
                 // >> TODO append socket channel to proxy channel group
-                masterHandler.proxyChannels().add(ch);
             }
         };
     }
