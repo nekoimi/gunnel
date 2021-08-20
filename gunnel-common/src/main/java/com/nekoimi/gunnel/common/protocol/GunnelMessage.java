@@ -9,7 +9,7 @@ import lombok.Data;
  * nekoimi  2021/8/14 18:24
  */
 @Data
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "of")
 public class GunnelMessage {
     private EMessage type;
     private Object message;

@@ -8,7 +8,7 @@ import com.nekoimi.gunnel.common.protocol.message.*;
  */
 public enum EMessage {
     // gunnel server <=> client
-    GU_LOGIN(0, GuAuth.class),
+    GU_LOGIN(0, GuLogin.class),
     GU_KEEPALIVE(1, GuKeepalive.class),
     GU_REGISTER(2, GuRegister.class),
 

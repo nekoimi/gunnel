@@ -7,7 +7,7 @@ import lombok.Data;
  * nekoimi  2021/8/15 12:22
  */
 @Data
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "of")
 public class GuDisconnected {
     private String channelId;
 }

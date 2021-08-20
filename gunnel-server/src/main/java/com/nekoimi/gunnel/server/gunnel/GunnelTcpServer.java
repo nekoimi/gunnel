@@ -54,7 +54,7 @@ public class GunnelTcpServer extends AbstractGunnelApplication {
 
     @Override
     public void restart() {
-        context().masterLoop().execute(() -> {
+        context().workerLoop().execute(() -> {
             do {
                 log.info("try restarting the {}...", name());
                 channel.close();

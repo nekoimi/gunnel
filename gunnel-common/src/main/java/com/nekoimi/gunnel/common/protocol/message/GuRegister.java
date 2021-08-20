@@ -10,7 +10,7 @@ import lombok.Data;
  * nekoimi  2021/8/14 18:13
  */
 @Data
-@Builder
+@Builder(builderMethodName = "of")
 public class GuRegister {
     private EProtocol EProtocol;
     private TcpProxyProperties tcpProperties;
