@@ -1,10 +1,17 @@
 package com.nekoimi.gunnel.client.handler;
 
 import com.nekoimi.gunnel.common.config.GunnelConfigParser;
+import com.nekoimi.gunnel.common.config.TcpProxyProperties;
+import com.nekoimi.gunnel.common.enums.EMessage;
+import com.nekoimi.gunnel.common.enums.EProtocol;
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
+import com.nekoimi.gunnel.common.protocol.message.GuKeepalive;
+import com.nekoimi.gunnel.common.protocol.message.GuLogin;
+import com.nekoimi.gunnel.common.protocol.message.GuRegister;
 import com.nekoimi.gunnel.common.utils.MessageUtils;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,10 +34,51 @@ public class GunnelClientHandler extends GunnelMessageHandler {
         super.channelActive(ctx);
         this.context = ctx;
         // 发送认证消息
-        MessageUtils.sendAuth(ctx, GunnelConfigParser.getClient().getId());
+        ctx.writeAndFlush(GunnelMessage.of(EMessage.GU_LOGIN, GuLogin.of("", "")));
     }
 
-//    @Override
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
+            if (evt == IdleStateEvent.FIRST_WRITER_IDLE_STATE_EVENT) {
+                log.debug("-- Idle state event -- {} send keepalive message to server!", evt);
+                ctx.writeAndFlush(GunnelMessage.of(EMessage.GU_KEEPALIVE, GuKeepalive.of()));
+                return;
+            }
+        }
+        super.userEventTriggered(ctx, evt);
+    }
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, GunnelMessage msg) throws Exception {
+        log.debug("--- {} ---", msg);
+        EMessage type = msg.getType();
+        Object message = msg.getMessage();
+        GunnelMessage resultMessage = null;
+        // >> TODO 服务器端返回验证成功， 需要提交代理注册信息
+        if (GuLogin.class.equals(type.getType())) {
+            resultMessage = handleLogin((GuLogin) message);
+        }
+
+        // other, the message type invalid...
+        else {
+            log.warn("The message type ( {} ) invalid...", type);
+        }
+
+        if (resultMessage != null) {
+            ctx.writeAndFlush(resultMessage);
+        }
+    }
+
+    protected GunnelMessage handleLogin(GuLogin message) {
+        log.debug("--- ".concat(message.toString()).concat(" ---"));
+        return GunnelMessage.of(EMessage.GU_REGISTER,
+                GuRegister.of().EProtocol(EProtocol.TCP).tcpProperties(
+                        TcpProxyProperties.of("192.168.1.202", 9000, 10000))
+        );
+    }
+
+    //    @Override
 //    protected void gunnelReadAuth(ChannelHandlerContext ctx, Auth message) {
 //        log.debug("Auth success!");
 //        // TODO 发送代理注册消息，将本地需要暴露的服务信息传送给服务器
@@ -80,9 +128,4 @@ public class GunnelClientHandler extends GunnelMessageHandler {
 //        log.debug("-- 收到来自服务器端的错误消息 --");
 //        ctx.close();
 //    }
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, GunnelMessage msg) throws Exception {
-
-    }
 }

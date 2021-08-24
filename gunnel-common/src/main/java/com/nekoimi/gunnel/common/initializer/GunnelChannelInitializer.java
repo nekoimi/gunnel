@@ -26,7 +26,7 @@ public abstract class GunnelChannelInitializer extends ChannelInitializer<Socket
          */
         pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 12, 4, 0, 0));
         // Idle 空闲时间处理机制
-        pipeline.addLast(new IdleStateHandler(60, 30, 0));
+        pipeline.addLast(new IdleStateHandler(0, 30, 0));
         // 自定义协议编码解码器
         pipeline.addLast(new GunnelMessageDecoder());
         pipeline.addLast(new GunnelMessageEncoder());

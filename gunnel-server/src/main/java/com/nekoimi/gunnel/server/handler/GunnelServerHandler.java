@@ -1,5 +1,6 @@
 package com.nekoimi.gunnel.server.handler;
 
+import com.nekoimi.gunnel.common.config.TcpProxyProperties;
 import com.nekoimi.gunnel.common.enums.EMessage;
 import com.nekoimi.gunnel.common.enums.EProtocol;
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
@@ -7,6 +8,7 @@ import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import com.nekoimi.gunnel.common.protocol.message.GuLogin;
 import com.nekoimi.gunnel.common.protocol.message.GuRegister;
 import com.nekoimi.gunnel.server.context.GunnelContext;
+import com.nekoimi.gunnel.server.net.proxy.TcpServer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import io.netty.channel.group.ChannelGroup;
@@ -28,6 +30,7 @@ public class GunnelServerHandler extends GunnelMessageHandler {
     private final ChannelGroup channels;
     private final ChannelId channelId;
     private final GunnelContext context;
+    private ChannelHandlerContext handlerContext;
 
     public GunnelServerHandler(GunnelContext context, ChannelId channelId) {
         log.debug("-- new GunnelServerHandler --, channelId: {}", channelId.asShortText());
@@ -36,15 +39,29 @@ public class GunnelServerHandler extends GunnelMessageHandler {
         channels = new DefaultChannelGroup(GROUP_NAME + channelId.asShortText(), GlobalEventExecutor.INSTANCE);
     }
 
+    public ChannelGroup channels() {
+        return channels;
+    }
+
+    public ChannelId channelId() {
+        return channelId;
+    }
+
+    public ChannelHandlerContext handlerContext() {
+        return handlerContext;
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.debug("-- [channelActive] channelId: {} --", ctx.channel().id().asShortText());
         super.channelActive(ctx);
+
+        this.handlerContext = ctx;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, GunnelMessage msg) throws Exception {
-        log.debug("------------------------ GunnelMessageHandler BEGIN ------------------------");
+        log.debug("------------------------ GunnelServerHandler BEGIN ------------------------");
         log.debug("message type: " + msg.getType());
         log.debug("message content: " + msg.toJsonMessage());
         EMessage type = msg.getType();
@@ -69,16 +86,29 @@ public class GunnelServerHandler extends GunnelMessageHandler {
         if (resultMessage != null) {
             ctx.writeAndFlush(resultMessage);
         }
-        log.debug("------------------------ GunnelMessageHandler BEGIN ------------------------");
+        log.debug("------------------------ GunnelServerHandler BEGIN ------------------------");
     }
 
 
     protected GunnelMessage handleLogin(GuLogin message) {
+        log.debug("--- {} ---", message);
         return GunnelMessage.of(EMessage.GU_LOGIN, GuLogin.of("", ""));
     }
 
     protected GunnelMessage handleRegister(GuRegister message) {
         EProtocol protocol = message.getEProtocol();
+        if (protocol == EProtocol.TCP) {
+            handleTcpRegister(message.getTcpProperties());
+        }
         return GunnelMessage.of(EMessage.GU_REGISTER, GuRegister.of().build());
+    }
+
+    private void handleTcpRegister(TcpProxyProperties tcpProperties) {
+        log.debug("--- {} ---", tcpProperties);
+
+        TcpServer tcpServer = new TcpServer("handleTcpRegister-TcpServer", context, tcpProperties.getRemotePort(), this);
+        tcpServer.start();
+
+        log.debug("--- TcpServer started!!! ---");
     }
 }

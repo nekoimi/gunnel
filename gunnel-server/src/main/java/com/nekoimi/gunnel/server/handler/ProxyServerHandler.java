@@ -1,5 +1,8 @@
 package com.nekoimi.gunnel.server.handler;
 
+import com.nekoimi.gunnel.common.enums.EMessage;
+import com.nekoimi.gunnel.common.protocol.GunnelMessage;
+import com.nekoimi.gunnel.common.protocol.message.GuData;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -9,14 +12,17 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ProxyServerHandler extends SimpleChannelInboundHandler<Object> {
+    private final GunnelServerHandler parentHandler;
+    public ProxyServerHandler(GunnelServerHandler parentHandler) {
+        this.parentHandler = parentHandler;
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+        log.debug("--- ProxyServerHandler --- \n {}", msg);
 
+        parentHandler.handlerContext().writeAndFlush(GunnelMessage.of(EMessage.GU_DATA, GuData.of(parentHandler.channelId().asShortText(), (byte[]) msg)));
     }
-//    private final GunnelServerHandler masterHandler;
-//    public ProxyServerHandler(GunnelServerHandler masterHandler) {
-//        this.masterHandler = masterHandler;
-//    }
 //
 //    @Override
 //    public void channelActive(ChannelHandlerContext ctx) throws Exception {

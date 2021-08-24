@@ -15,7 +15,7 @@ import java.util.concurrent.CountDownLatch;
  * nekoimi  2021/8/13 20:52
  */
 @Slf4j
-public class GunnelServerStarter {
+public class GunnelServer {
     private static final GunnelContext context = new GunnelContext();
     private final EventLoopGroup masterLoop = new NioEventLoopGroup(1, new DefaultThreadFactory("masterLoop"));
     private final EventLoopGroup workerLoop = new NioEventLoopGroup(new DefaultThreadFactory("workerLoop"));
@@ -39,6 +39,6 @@ public class GunnelServerStarter {
     }
 
     public static void main(String[] args) {
-        new GunnelServerStarter().start();
+        new GunnelServer().start();
     }
 }

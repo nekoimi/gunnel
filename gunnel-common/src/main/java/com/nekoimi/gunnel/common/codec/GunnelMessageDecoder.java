@@ -52,7 +52,7 @@ public class GunnelMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
 
         Object message = JsonUtils.parse(data.toString(), eMessage.getType());
 
-        out.add(new GunnelMessage(eMessage, message));
+        out.add(GunnelMessage.of(eMessage, message));
 
         log.debug("------------------------ GunnelMessageDecoder END ------------------------");
     }
