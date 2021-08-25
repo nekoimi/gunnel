@@ -39,6 +39,11 @@ public class GunnelServerApp {
                     log.debug("push event...");
                     // >> TODO push event.
                     eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10000)));
+                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10001)));
+                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10002)));
+                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10003)));
+                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10004)));
+
 
                     TimeUnit.SECONDS.sleep(5);
                     log.debug("push shutdown event...");
