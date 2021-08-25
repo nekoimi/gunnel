@@ -1,12 +1,11 @@
 package com.nekoimi.gunnel.server.contract;
 
-
 import com.nekoimi.gunnel.server.context.GunnelContext;
 
 /**
- * nekoimi  2021/8/16 20:59
+ * nekoimi  2021/8/16 21:04
  */
-public interface GunnelApplication extends Runnable {
+public interface ProxyApplication extends Runnable {
     /**
      * 获取应用名称
      *

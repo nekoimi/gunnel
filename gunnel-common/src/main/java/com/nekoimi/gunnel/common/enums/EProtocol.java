@@ -5,6 +5,7 @@ package com.nekoimi.gunnel.common.enums;
  */
 public enum EProtocol {
     TCP,
-    WEBSOCKET,
-    HTTP
+    UDP,
+    HTTP,
+    HTTPS
 }

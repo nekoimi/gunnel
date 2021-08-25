@@ -8,7 +8,6 @@ import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import com.nekoimi.gunnel.common.protocol.message.GuLogin;
 import com.nekoimi.gunnel.common.protocol.message.GuRegister;
 import com.nekoimi.gunnel.server.context.GunnelContext;
-import com.nekoimi.gunnel.server.net.proxy.TcpServer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import io.netty.channel.group.ChannelGroup;
@@ -105,9 +104,6 @@ public class GunnelServerHandler extends GunnelMessageHandler {
 
     private void handleTcpRegister(TcpProxyProperties tcpProperties) {
         log.debug("--- {} ---", tcpProperties);
-
-        TcpServer tcpServer = new TcpServer("handleTcpRegister-TcpServer", context, tcpProperties.getRemotePort(), this);
-        tcpServer.start();
 
         log.debug("--- TcpServer started!!! ---");
     }

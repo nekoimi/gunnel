@@ -2,63 +2,70 @@ package com.nekoimi.gunnel.server.gunnel;
 
 import com.nekoimi.gunnel.common.codec.GunnelMessageDecoder;
 import com.nekoimi.gunnel.common.codec.GunnelMessageEncoder;
+import com.nekoimi.gunnel.server.config.ConfigApplication;
 import com.nekoimi.gunnel.server.context.GunnelContext;
 import com.nekoimi.gunnel.server.handler.GunnelServerHandler;
 import com.nekoimi.gunnel.server.handler.ServerIdleCheckHandler;
+import com.nekoimi.gunnel.server.proxy.ProxyApplication;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * nekoimi  2021/8/16 23:47
  */
 @Slf4j
-public class GunnelTcpServer extends AbstractGunnelApplication {
+public class GunnelServer extends GunnelApplication {
     private final ServerBootstrap bootstrap = new ServerBootstrap();
+    private final GunnelApplication configApp;
+    private final ConcurrentMap<String, ProxyApplication> container = new ConcurrentHashMap<>();
     private Channel channel;
 
-    public GunnelTcpServer(String name, GunnelContext context) {
+    public GunnelServer(String name, GunnelContext context) {
         super(name, context);
-        bootstrap.group(context().masterLoop(), context().workerLoop())
+        this.configApp = new ConfigApplication("default-config", context);
+        bootstrap.group(context().masterLoop, context().workerLoop)
                 .channel(NioServerSocketChannel.class)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .handler(new LoggingHandler())
-                .childHandler(new GunnelTcpServerInitializer(context()));
+                .childHandler(new GunnelServerInitializer(context()));
     }
 
-    @Override
     public void start() {
-        channel = bootstrap.bind(context().properties().getPort())
-                .addListener(future -> {
-                    if (future.isSuccess()) {
-                        log.info("{} start success! listening on port {}", name(), context().properties().getPort());
-                    } else {
-                        log.error("{} start on {} failed! {}", name(), context().properties().getPort(), future.cause().getMessage());
-                    }
-                })
-                .channel();
-        channel.closeFuture().addListener(future -> {
+        configApp.start();
+        context().eventBus.register(this);
+        channel = bootstrap.bind(context().properties().getPort()).addListener(future -> {
+            container.forEach((s, proxyApplication) -> proxyApplication.start());
+            if (future.isSuccess()) {
+                log.info("{} start success! listening on port {}", name(), context().properties().getPort());
+            } else {
+                log.error("{} start on {} failed! {}", name(), context().properties().getPort(), future.cause().getMessage());
+            }
+        }).channel();
+        ChannelFuture future = channel.closeFuture().addListener(cf -> {
             log.debug("{} channel close...", name());
             shutdown();
         });
+        try {
+            future.sync();
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+            shutdown();
+        }
     }
 
-    @Override
     public void restart() {
-        context().workerLoop().execute(() -> {
+        context().workerLoop.execute(() -> {
             do {
-                log.info("try restarting the {}...", name());
-                channel.close();
                 try {
+                    log.info("try restarting the {}...", name());
+                    shutdown();
                     TimeUnit.SECONDS.sleep(5);
                     start();
                     log.info("restart {} success!", name());
@@ -73,21 +80,31 @@ public class GunnelTcpServer extends AbstractGunnelApplication {
                 }
             } while (true);
         });
-        super.restart();
     }
 
-    @Override
     public void shutdown() {
         log.info("{} shutdown...", name());
+        context().eventBus.unregister(this);
+        container.forEach((s, proxyApplication) -> proxyApplication.shutdown());
         if (channel != null && channel.isOpen()) {
             channel.close();
         }
-        super.shutdown();
+        configApp.shutdown();
     }
 
-    private final static class GunnelTcpServerInitializer extends ChannelInitializer<SocketChannel> {
+    /**
+     * 添加其他服务
+     *
+     * @param proxy
+     */
+    public void extend(ProxyApplication proxy) {
+        container.putIfAbsent(proxy.name(), proxy);
+    }
+
+    private final static class GunnelServerInitializer extends ChannelInitializer<SocketChannel> {
         private final GunnelContext context;
-        public GunnelTcpServerInitializer(GunnelContext context) {
+
+        public GunnelServerInitializer(GunnelContext context) {
             this.context = context;
         }
 

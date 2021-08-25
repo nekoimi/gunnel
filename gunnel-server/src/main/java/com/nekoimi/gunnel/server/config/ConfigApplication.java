@@ -3,16 +3,16 @@ package com.nekoimi.gunnel.server.config;
 import com.nekoimi.gunnel.common.constants.SystemConstants;
 import com.nekoimi.gunnel.common.utils.YamlUtils;
 import com.nekoimi.gunnel.server.context.GunnelContext;
-import com.nekoimi.gunnel.server.gunnel.AbstractGunnelApplication;
+import com.nekoimi.gunnel.server.gunnel.GunnelApplication;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * nekoimi  2021/8/16 21:47
  */
 @Slf4j
-public class GunnelConfigApplication extends AbstractGunnelApplication {
+public class ConfigApplication extends GunnelApplication {
     private ServerProperties serverProperties = new ServerProperties();
-    public GunnelConfigApplication(String name, GunnelContext context) {
+    public ConfigApplication(String name, GunnelContext context) {
         super(name, context);
     }
 
@@ -27,6 +27,7 @@ public class GunnelConfigApplication extends AbstractGunnelApplication {
     @Override
     public void start() {
         loadServerPropertiesByYaml();
+        context().eventBus.register(this);
         context().setProperties(serverProperties);
     }
 
@@ -38,7 +39,8 @@ public class GunnelConfigApplication extends AbstractGunnelApplication {
 
     @Override
     public void shutdown() {
-        super.shutdown();
+        context().eventBus.unregister(this);
         context().setProperties(null);
+        super.shutdown();
     }
 }
