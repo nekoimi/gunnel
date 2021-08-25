@@ -13,5 +13,5 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor(staticName = "of")
 public class Port {
     private EProtocol protocol;
-    private int port;
+    private int value;
 }

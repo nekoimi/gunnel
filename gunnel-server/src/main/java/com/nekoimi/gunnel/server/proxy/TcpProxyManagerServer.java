@@ -2,8 +2,11 @@ package com.nekoimi.gunnel.server.proxy;
 
 import com.google.common.eventbus.Subscribe;
 import com.nekoimi.gunnel.server.context.GunnelContext;
+import com.nekoimi.gunnel.server.event.ShutdownEvent;
 import com.nekoimi.gunnel.server.event.TcpProxyRegisterEvent;
+import com.nekoimi.gunnel.server.ports.Port;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
@@ -14,7 +17,8 @@ import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * nekoimi  2021/8/24 16:24
@@ -22,7 +26,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Slf4j
 public class TcpProxyManagerServer extends ProxyApplication {
     private final ServerBootstrap bootstrap = new ServerBootstrap();
-    private final CopyOnWriteArraySet<Integer> bindPorts = new CopyOnWriteArraySet<>();
+    private final ConcurrentMap<Port, Channel> portOfChannels = new ConcurrentHashMap<>();
 
     public TcpProxyManagerServer(String name, GunnelContext context) {
         super(name, context);
@@ -39,20 +43,23 @@ public class TcpProxyManagerServer extends ProxyApplication {
     }
 
     @Override
-    public void shutdown() {
+    @Subscribe
+    public void shutdown(ShutdownEvent event) {
+        portOfChannels.clear();
         context().eventBus.unregister(this);
-        super.shutdown();
     }
 
     @Subscribe
     public void register(TcpProxyRegisterEvent event) {
-        bootstrap.bind(event.getPort()).addListener(bf -> {
+        Channel channel = bootstrap.bind(event.getPort().getValue()).addListener(bf -> {
             if (bf.isSuccess()) {
                 log.info("{} bind to {} success!", name(), event.getPort());
             } else {
                 log.error("{} bind on {} failed! {}", name(), event.getPort(), bf.cause().getMessage());
             }
-        }).channel().closeFuture().addListener(cf -> {
+        }).channel();
+        portOfChannels.putIfAbsent(event.getPort(), channel);
+        channel.closeFuture().addListener(cf -> {
             log.debug("bind on {} channel close...", event.getPort());
         });
     }

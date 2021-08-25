@@ -1,6 +1,7 @@
 package com.nekoimi.gunnel.server.contract;
 
 import com.nekoimi.gunnel.server.context.GunnelContext;
+import com.nekoimi.gunnel.server.event.ShutdownEvent;
 
 /**
  * nekoimi  2021/8/16 21:04
@@ -33,5 +34,5 @@ public interface ProxyApplication extends Runnable {
     /**
      * 停止
      */
-    void shutdown();
+    void shutdown(ShutdownEvent event);
 }

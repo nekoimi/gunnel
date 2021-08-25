@@ -1,5 +1,6 @@
 package com.nekoimi.gunnel.server.event;
 
+import com.nekoimi.gunnel.server.ports.Port;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -11,5 +12,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor(staticName = "event")
 public class TcpProxyRegisterEvent {
-    private int port;
+    private Port port;
 }

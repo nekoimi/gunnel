@@ -2,6 +2,7 @@ package com.nekoimi.gunnel.server.gunnel;
 
 import com.nekoimi.gunnel.server.context.GunnelContext;
 import com.nekoimi.gunnel.server.contract.ProxyApplication;
+import com.nekoimi.gunnel.server.event.ShutdownEvent;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -32,7 +33,7 @@ public abstract class GunnelApplication implements ProxyApplication {
     }
 
     @Override
-    public void shutdown() {
+    public void shutdown(ShutdownEvent event) {
         // TODO
     }
 

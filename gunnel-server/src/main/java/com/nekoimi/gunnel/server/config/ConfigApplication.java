@@ -1,8 +1,10 @@
 package com.nekoimi.gunnel.server.config;
 
+import com.google.common.eventbus.Subscribe;
 import com.nekoimi.gunnel.common.constants.SystemConstants;
 import com.nekoimi.gunnel.common.utils.YamlUtils;
 import com.nekoimi.gunnel.server.context.GunnelContext;
+import com.nekoimi.gunnel.server.event.ShutdownEvent;
 import com.nekoimi.gunnel.server.gunnel.GunnelApplication;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,21 +28,19 @@ public class ConfigApplication extends GunnelApplication {
 
     @Override
     public void start() {
-        loadServerPropertiesByYaml();
         context().eventBus.register(this);
+        loadServerPropertiesByYaml();
         context().setProperties(serverProperties);
     }
 
     @Override
     public void restart() {
         start();
-        super.restart();
     }
 
     @Override
-    public void shutdown() {
+    @Subscribe
+    public void shutdown(ShutdownEvent event) {
         context().eventBus.unregister(this);
-        context().setProperties(null);
-        super.shutdown();
     }
 }

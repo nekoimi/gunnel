@@ -1,9 +1,11 @@
 package com.nekoimi.gunnel.server.gunnel;
 
+import com.google.common.eventbus.Subscribe;
 import com.nekoimi.gunnel.common.codec.GunnelMessageDecoder;
 import com.nekoimi.gunnel.common.codec.GunnelMessageEncoder;
 import com.nekoimi.gunnel.server.config.ConfigApplication;
 import com.nekoimi.gunnel.server.context.GunnelContext;
+import com.nekoimi.gunnel.server.event.ShutdownEvent;
 import com.nekoimi.gunnel.server.handler.GunnelServerHandler;
 import com.nekoimi.gunnel.server.handler.ServerIdleCheckHandler;
 import com.nekoimi.gunnel.server.proxy.ProxyApplication;
@@ -50,13 +52,13 @@ public class GunnelServer extends GunnelApplication {
         }).channel();
         ChannelFuture future = channel.closeFuture().addListener(cf -> {
             log.debug("{} channel close...", name());
-            shutdown();
+            shutdown(ShutdownEvent.event());
         });
         try {
             future.sync();
         } catch (InterruptedException e) {
             log.error(e.getMessage());
-            shutdown();
+            shutdown(ShutdownEvent.event());
         }
     }
 
@@ -65,7 +67,7 @@ public class GunnelServer extends GunnelApplication {
             do {
                 try {
                     log.info("try restarting the {}...", name());
-                    shutdown();
+                    shutdown(ShutdownEvent.event());
                     TimeUnit.SECONDS.sleep(5);
                     start();
                     log.info("restart {} success!", name());
@@ -82,14 +84,12 @@ public class GunnelServer extends GunnelApplication {
         });
     }
 
-    public void shutdown() {
+    @Subscribe
+    public void shutdown(ShutdownEvent event) {
         log.info("{} shutdown...", name());
-        context().eventBus.unregister(this);
-        container.forEach((s, proxyApplication) -> proxyApplication.shutdown());
         if (channel != null && channel.isOpen()) {
             channel.close();
         }
-        configApp.shutdown();
     }
 
     /**
