@@ -33,25 +33,27 @@ public class GunnelServerApp {
 //            gunnels.extend("proxy-udp-server", null);
 //            gunnels.extend("proxy-http-server", null);
 //            gunnels.extend("proxy-https-server", null);
-            workerLoop.execute(() -> {
-                try {
-                    TimeUnit.SECONDS.sleep(5);
-                    log.debug("push event...");
-                    // >> TODO push event.
-                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10000)));
-                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10001)));
-                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10002)));
-                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10003)));
-                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10004)));
-
-
-                    TimeUnit.SECONDS.sleep(5);
-                    log.debug("push shutdown event...");
-                    eventBus.publish(ShutdownEvent.event());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            });
+//
+//            workerLoop.execute(() -> {
+//                try {
+//                    TimeUnit.SECONDS.sleep(5);
+//                    log.debug("push event...");
+//                    // >> TODO push event.
+//                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10000)));
+//                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10001)));
+//                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10002)));
+//                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10003)));
+//                    eventBus.publish(TcpProxyRegisterEvent.event(Port.of(EProtocol.TCP, 10004)));
+//
+//
+//                    TimeUnit.SECONDS.sleep(5);
+//                    log.debug("push shutdown event...");
+//                    eventBus.publish(ShutdownEvent.event());
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            });
+//
             gunnels.start();
         } catch (Exception e) {
             log.error(e.getMessage());

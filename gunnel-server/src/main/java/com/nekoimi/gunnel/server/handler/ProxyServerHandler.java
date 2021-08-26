@@ -20,7 +20,7 @@ public class ProxyServerHandler extends SimpleChannelInboundHandler<Object> {
     }
 
     /**
-     *
+     * 通知客户端和代理服务建立连接
      * @param ctx
      * @throws Exception
      */
@@ -30,13 +30,24 @@ public class ProxyServerHandler extends SimpleChannelInboundHandler<Object> {
         serverHandler.clientContext().writeAndFlush(GunnelMessage.of(EMessage.GU_CONNECT, GuConnect.of("")));
     }
 
+    /**
+     * 转发流量到客户端
+     * @param ctx
+     * @param msg
+     * @throws Exception
+     */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         log.debug("--- ProxyServerHandler --- channelRead0:\n {}", msg);
-
-        serverHandler.clientContext().writeAndFlush(GunnelMessage.of(EMessage.GU_DATA, GuData.of("", (byte[]) msg)));
+        byte[] data = (byte[]) msg;
+        serverHandler.clientContext().writeAndFlush(GunnelMessage.of(EMessage.GU_DATA, GuData.of("", data)));
     }
 
+    /**
+     * 通知客户端断开连接
+     * @param ctx
+     * @throws Exception
+     */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         log.debug("--- ProxyServerHandler --- channelInactive: {}", ctx.channel().id());

@@ -6,12 +6,16 @@ import com.nekoimi.gunnel.common.enums.EProtocol;
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import com.nekoimi.gunnel.common.protocol.message.GuKeepalive;
-import com.nekoimi.gunnel.common.protocol.request.GuLoginReq;
 import com.nekoimi.gunnel.common.protocol.message.GuRegister;
+import com.nekoimi.gunnel.common.protocol.request.GuLoginReq;
+import com.nekoimi.gunnel.common.protocol.response.GuLoginResp;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -32,15 +36,21 @@ public class GunnelClientHandler extends GunnelMessageHandler {
         super.channelActive(ctx);
         this.context = ctx;
         // 发送认证消息
-        ctx.writeAndFlush(GunnelMessage.of(EMessage.GU_LOGIN_REQ, GuLoginReq.of()));
+        String hostname = ctx.channel().localAddress().toString();
+        String os = System.getProperty("os.name");
+        String arch = System.getProperty("os.arch");
+        String user = System.getProperty("user.name");
+        long clientId = new Random().nextLong();
+        GuLoginReq loginReq = GuLoginReq.of("", hostname, os, arch, user, clientId, null);
+        ctx.writeAndFlush(GunnelMessage.of(EMessage.GU_LOGIN_REQ, loginReq));
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
-            if (evt == IdleStateEvent.FIRST_WRITER_IDLE_STATE_EVENT) {
-                log.debug("-- Idle state event -- {} send keepalive message to server!", evt);
-                ctx.writeAndFlush(GunnelMessage.of(EMessage.GU_KEEPALIVE, GuKeepalive.of()));
+            if (evt == IdleStateEvent.WRITER_IDLE_STATE_EVENT) {
+                log.debug("-- Idle state event -- {}, need send keepalive message to server!", evt);
+                ctx.writeAndFlush(Unpooled.copiedBuffer("ping", StandardCharsets.UTF_8));
                 return;
             }
         }
@@ -54,8 +64,8 @@ public class GunnelClientHandler extends GunnelMessageHandler {
         Object message = msg.getMessage();
         GunnelMessage resultMessage = null;
         // >> TODO 服务器端返回验证成功， 需要提交代理注册信息
-        if (GuLoginReq.class.equals(type.getType())) {
-            resultMessage = handleLogin((GuLoginReq) message);
+        if (GuLoginResp.class.equals(type.getType())) {
+            resultMessage = handleLoginResp((GuLoginResp) message);
         }
 
         // other, the message type invalid...
@@ -68,7 +78,7 @@ public class GunnelClientHandler extends GunnelMessageHandler {
         }
     }
 
-    protected GunnelMessage handleLogin(GuLoginReq message) {
+    protected GunnelMessage handleLoginResp(GuLoginResp message) {
         log.debug("--- ".concat(message.toString()).concat(" ---"));
         return GunnelMessage.of(EMessage.GU_REGISTER,
                 GuRegister.of().EProtocol(EProtocol.TCP).tcpProperties(

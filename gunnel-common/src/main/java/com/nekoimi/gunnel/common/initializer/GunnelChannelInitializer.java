@@ -16,6 +16,9 @@ public abstract class GunnelChannelInitializer extends ChannelInitializer<Socket
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
+        // Idle 空闲时间处理机制
+        pipeline.addLast(new IdleStateHandler(0, 5, 0));
+
         /**
          * Netty的TCP分包处理器
          * >> TODO 粘包、半包初始配置，根据自定义的协议
@@ -25,8 +28,6 @@ public abstract class GunnelChannelInitializer extends ChannelInitializer<Socket
          * >> TODO 这样解码之后 ByteBuf 里面就包含全部的数据 => 版本号 + 消息类型 + 长度 + 数据
          */
         pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 12, 4, 0, 0));
-        // Idle 空闲时间处理机制
-        pipeline.addLast(new IdleStateHandler(0, 30, 0));
         // 自定义协议编码解码器
         pipeline.addLast(new GunnelMessageDecoder());
         pipeline.addLast(new GunnelMessageEncoder());

@@ -1,5 +1,7 @@
 package com.nekoimi.gunnel.server.handler;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -17,6 +19,12 @@ import java.util.concurrent.TimeUnit;
 public class ServerIdleCheckHandler extends IdleStateHandler {
     public ServerIdleCheckHandler(long readerIdleTime) {
         super(readerIdleTime, 0, 0, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        super.channelRead(ctx, msg);
+        log.debug("-- Idle state read -- ping: {}", msg);
     }
 
     @Override
