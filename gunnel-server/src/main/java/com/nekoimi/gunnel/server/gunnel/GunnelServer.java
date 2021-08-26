@@ -43,7 +43,7 @@ public class GunnelServer extends GunnelApplication {
         configApp.start();
         context().eventBus.register(this);
         channel = bootstrap.bind(context().properties().getPort()).addListener(future -> {
-            container.forEach((s, proxyApplication) -> proxyApplication.start());
+            container.forEach((s, pa) -> pa.start());
             if (future.isSuccess()) {
                 log.info("{} start success! listening on port {}", name(), context().properties().getPort());
             } else {
@@ -51,7 +51,7 @@ public class GunnelServer extends GunnelApplication {
             }
         }).channel();
         ChannelFuture future = channel.closeFuture().addListener(cf -> {
-            log.debug("{} channel close...", name());
+            log.info("{} channel close...", name());
             shutdown(ShutdownEvent.event());
         });
         try {
@@ -64,7 +64,7 @@ public class GunnelServer extends GunnelApplication {
 
     public void restart() {
         context().workerLoop.execute(() -> {
-            do {
+            for (;;) {
                 try {
                     log.info("try restarting the {}...", name());
                     shutdown(ShutdownEvent.event());
@@ -72,15 +72,15 @@ public class GunnelServer extends GunnelApplication {
                     start();
                     log.info("restart {} success!", name());
                     break;
-                } catch (InterruptedException e) {
-                    log.error("{} restart failed, {}", name(), e.getMessage());
+                } catch (InterruptedException var1) {
+                    log.error("{} restart failed, {}", name(), var1.getMessage());
                     try {
                         TimeUnit.SECONDS.sleep(10);
-                    } catch (InterruptedException var1) {
-                        log.error(var1.getMessage());
+                    } catch (InterruptedException var2) {
+                        log.error(var2.getMessage());
                     }
                 }
-            } while (true);
+            }
         });
     }
 

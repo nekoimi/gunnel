@@ -46,8 +46,10 @@ public class TcpProxyManagerServer extends ProxyApplication {
     @Subscribe
     public void shutdown(ShutdownEvent event) {
         portOfChannels.forEach((port, channel) -> {
-            channel.close();
-            log.debug("bind on {} channel close...", port);
+            if (channel != null && channel.isOpen()) {
+                channel.close();
+            }
+            log.info("bind on {} channel close...", port);
         });
         portOfChannels.clear();
         context().eventBus.unregister(this);
@@ -64,7 +66,7 @@ public class TcpProxyManagerServer extends ProxyApplication {
         }).channel();
         portOfChannels.putIfAbsent(event.getPort(), channel);
         channel.closeFuture().addListener(cf -> {
-            log.debug("bind on {} channel close...", event.getPort());
+            log.info("bind on {} channel close...", event.getPort());
         });
     }
 

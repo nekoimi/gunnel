@@ -10,6 +10,11 @@ public interface SystemConstants {
     String APPLICATION_NAME = "gunnel";
 
     /**
+     * gunnel 版本
+     */
+    String GUNNEL_VERSION = "1.0-dev";
+
+    /**
      * 消息协议版本
      */
     double PROTOCOL_VERSION = 1.0;

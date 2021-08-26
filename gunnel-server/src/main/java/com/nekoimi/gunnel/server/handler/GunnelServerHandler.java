@@ -5,8 +5,10 @@ import com.nekoimi.gunnel.common.enums.EMessage;
 import com.nekoimi.gunnel.common.enums.EProtocol;
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
-import com.nekoimi.gunnel.common.protocol.message.GuLogin;
+import com.nekoimi.gunnel.common.protocol.request.GuLoginReq;
 import com.nekoimi.gunnel.common.protocol.message.GuRegister;
+import com.nekoimi.gunnel.common.protocol.response.GuLoginResp;
+import com.nekoimi.gunnel.server.cache.Caches;
 import com.nekoimi.gunnel.server.context.GunnelContext;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
@@ -14,6 +16,8 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * nekoimi  2021/8/14 16:50
@@ -25,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class GunnelServerHandler extends GunnelMessageHandler {
+    private final ConcurrentMap<String, String> clients = Caches.newCache();
     private static final String GROUP_NAME = "ChannelGroup-";
     private final ChannelGroup channels;
     private final ChannelId channelId;
@@ -68,8 +73,8 @@ public class GunnelServerHandler extends GunnelMessageHandler {
         GunnelMessage resultMessage = null;
 
         // >> TODO 客户端验证
-        if (GuLogin.class.equals(type.getType())) {
-            resultMessage = handleLogin((GuLogin) message);
+        if (GuLoginReq.class.equals(type.getType())) {
+            resultMessage = handleLogin((GuLoginReq) message);
         }
 
         // >> TODO 客户端注册代理
@@ -89,9 +94,9 @@ public class GunnelServerHandler extends GunnelMessageHandler {
     }
 
 
-    protected GunnelMessage handleLogin(GuLogin message) {
+    protected GunnelMessage handleLogin(GuLoginReq message) {
         log.debug("--- {} ---", message);
-        return GunnelMessage.of(EMessage.GU_LOGIN, GuLogin.of("", ""));
+        return GunnelMessage.of(EMessage.GU_LOGIN_RESP, GuLoginResp.of());
     }
 
     protected GunnelMessage handleRegister(GuRegister message) {

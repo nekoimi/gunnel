@@ -1,23 +1,24 @@
 package com.nekoimi.gunnel.common.enums;
 
+import com.nekoimi.gunnel.common.constants.GuMessage;
 import com.nekoimi.gunnel.common.errors.GunnelRuntimeException;
 import com.nekoimi.gunnel.common.protocol.message.*;
+import com.nekoimi.gunnel.common.protocol.request.GuLoginReq;
+import com.nekoimi.gunnel.common.protocol.response.GuLoginResp;
 
 /**
  * nekoimi  2021/8/14 14:22
  */
-public enum EMessage {
-    // gunnel server <=> client
-    GU_LOGIN(0, GuLogin.class),
+public enum EMessage implements GuMessage {
     GU_KEEPALIVE(1, GuKeepalive.class),
-    GU_REGISTER(2, GuRegister.class),
 
-    // gunnel proxy server <=> client
+    GU_LOGIN_REQ(0, GuLoginReq.class),
+    GU_LOGIN_RESP(1, GuLoginResp.class),
+
+    GU_REGISTER(2, GuRegister.class),
     GU_CONNECTED(3, GuConnected.class),
     GU_DATA(4, GuData.class),
     GU_DISCONNECTED(5, GuDisconnected.class),
-
-    // gunnel error
     GU_ERROR(9, GuError.class)
     ;
 

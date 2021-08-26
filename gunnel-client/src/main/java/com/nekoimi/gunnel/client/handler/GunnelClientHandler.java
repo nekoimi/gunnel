@@ -1,15 +1,13 @@
 package com.nekoimi.gunnel.client.handler;
 
-import com.nekoimi.gunnel.common.config.GunnelConfigParser;
 import com.nekoimi.gunnel.common.config.TcpProxyProperties;
 import com.nekoimi.gunnel.common.enums.EMessage;
 import com.nekoimi.gunnel.common.enums.EProtocol;
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import com.nekoimi.gunnel.common.protocol.message.GuKeepalive;
-import com.nekoimi.gunnel.common.protocol.message.GuLogin;
+import com.nekoimi.gunnel.common.protocol.request.GuLoginReq;
 import com.nekoimi.gunnel.common.protocol.message.GuRegister;
-import com.nekoimi.gunnel.common.utils.MessageUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +32,7 @@ public class GunnelClientHandler extends GunnelMessageHandler {
         super.channelActive(ctx);
         this.context = ctx;
         // 发送认证消息
-        ctx.writeAndFlush(GunnelMessage.of(EMessage.GU_LOGIN, GuLogin.of("", "")));
+        ctx.writeAndFlush(GunnelMessage.of(EMessage.GU_LOGIN_REQ, GuLoginReq.of()));
     }
 
     @Override
@@ -56,8 +54,8 @@ public class GunnelClientHandler extends GunnelMessageHandler {
         Object message = msg.getMessage();
         GunnelMessage resultMessage = null;
         // >> TODO 服务器端返回验证成功， 需要提交代理注册信息
-        if (GuLogin.class.equals(type.getType())) {
-            resultMessage = handleLogin((GuLogin) message);
+        if (GuLoginReq.class.equals(type.getType())) {
+            resultMessage = handleLogin((GuLoginReq) message);
         }
 
         // other, the message type invalid...
@@ -70,7 +68,7 @@ public class GunnelClientHandler extends GunnelMessageHandler {
         }
     }
 
-    protected GunnelMessage handleLogin(GuLogin message) {
+    protected GunnelMessage handleLogin(GuLoginReq message) {
         log.debug("--- ".concat(message.toString()).concat(" ---"));
         return GunnelMessage.of(EMessage.GU_REGISTER,
                 GuRegister.of().EProtocol(EProtocol.TCP).tcpProperties(

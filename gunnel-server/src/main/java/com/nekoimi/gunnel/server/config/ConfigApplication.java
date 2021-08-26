@@ -8,6 +8,8 @@ import com.nekoimi.gunnel.server.event.ShutdownEvent;
 import com.nekoimi.gunnel.server.gunnel.GunnelApplication;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.TimeZone;
+
 /**
  * nekoimi  2021/8/16 21:47
  */
@@ -28,6 +30,9 @@ public class ConfigApplication extends GunnelApplication {
 
     @Override
     public void start() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
+        log.debug("set default timezone done.");
+
         context().eventBus.register(this);
         loadServerPropertiesByYaml();
         context().setProperties(serverProperties);
