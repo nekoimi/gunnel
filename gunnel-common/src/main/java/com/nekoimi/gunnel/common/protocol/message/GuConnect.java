@@ -8,6 +8,6 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor(staticName = "of")
-public class GuDisconnected {
+public class GuConnect {
     private String channelId;
 }

@@ -32,14 +32,12 @@ public class GunnelServerHandler extends GunnelMessageHandler {
     private final ConcurrentMap<String, String> clients = Caches.newCache();
     private static final String GROUP_NAME = "ChannelGroup-";
     private final ChannelGroup channels;
-    private final ChannelId channelId;
     private final GunnelContext context;
-    private ChannelHandlerContext handlerContext;
+    private ChannelHandlerContext clientContext;
 
     public GunnelServerHandler(GunnelContext context, ChannelId channelId) {
         log.debug("-- new GunnelServerHandler --, channelId: {}", channelId.asShortText());
         this.context = context;
-        this.channelId = channelId;
         channels = new DefaultChannelGroup(GROUP_NAME + channelId.asShortText(), GlobalEventExecutor.INSTANCE);
     }
 
@@ -47,20 +45,15 @@ public class GunnelServerHandler extends GunnelMessageHandler {
         return channels;
     }
 
-    public ChannelId channelId() {
-        return channelId;
-    }
-
-    public ChannelHandlerContext handlerContext() {
-        return handlerContext;
+    public ChannelHandlerContext clientContext() {
+        return clientContext;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.debug("-- [channelActive] channelId: {} --", ctx.channel().id().asShortText());
         super.channelActive(ctx);
-
-        this.handlerContext = ctx;
+        this.clientContext = ctx;
     }
 
     @Override

@@ -16,9 +16,9 @@ public enum EMessage implements GuMessage {
     GU_LOGIN_RESP(1, GuLoginResp.class),
 
     GU_REGISTER(2, GuRegister.class),
-    GU_CONNECTED(3, GuConnected.class),
+    GU_CONNECT(3, GuConnect.class),
     GU_DATA(4, GuData.class),
-    GU_DISCONNECTED(5, GuDisconnected.class),
+    GU_DISCONNECT(5, GuDisconnect.class),
     GU_ERROR(9, GuError.class)
     ;
 
