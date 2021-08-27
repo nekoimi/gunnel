@@ -10,7 +10,7 @@ import lombok.Data;
  * TCP 代理注册事件
  */
 @Data
-@AllArgsConstructor(staticName = "event")
-public class TcpProxyRegisterEvent {
+@AllArgsConstructor(staticName = "of")
+public class ProxyRegisterEvent {
     private Port port;
 }

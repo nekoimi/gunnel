@@ -5,10 +5,10 @@ import com.nekoimi.gunnel.common.enums.EMessage;
 import com.nekoimi.gunnel.common.enums.EProtocol;
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
-import com.nekoimi.gunnel.common.protocol.message.GuKeepalive;
 import com.nekoimi.gunnel.common.protocol.message.GuRegister;
 import com.nekoimi.gunnel.common.protocol.request.GuLoginReq;
 import com.nekoimi.gunnel.common.protocol.response.GuLoginResp;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -50,7 +50,8 @@ public class GunnelClientHandler extends GunnelMessageHandler {
         if (evt instanceof IdleStateEvent) {
             if (evt == IdleStateEvent.WRITER_IDLE_STATE_EVENT) {
                 log.debug("-- Idle state event -- {}, need send keepalive message to server!", evt);
-                ctx.writeAndFlush(Unpooled.copiedBuffer("ping", StandardCharsets.UTF_8));
+                ByteBuf ping = Unpooled.copiedBuffer("ping", StandardCharsets.UTF_8);
+                ctx.writeAndFlush(ping);
                 return;
             }
         }

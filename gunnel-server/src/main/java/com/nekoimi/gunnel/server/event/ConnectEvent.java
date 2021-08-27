@@ -1,10 +1,12 @@
 package com.nekoimi.gunnel.server.event;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
- * nekoimi  2021/8/25 15:23
+ * nekoimi  2021/8/27 10:50
  */
+@Data
 @AllArgsConstructor(staticName = "of")
-public class RefreshConfigEvent {
+public class ConnectEvent {
 }

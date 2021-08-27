@@ -17,7 +17,7 @@ public abstract class GunnelChannelInitializer extends ChannelInitializer<Socket
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
         // Idle 空闲时间处理机制
-        pipeline.addLast(new IdleStateHandler(0, 5, 0));
+        pipeline.addLast(new IdleStateHandler(0, 10, 0));
 
         /**
          * Netty的TCP分包处理器

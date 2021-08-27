@@ -5,6 +5,6 @@ import lombok.AllArgsConstructor;
 /**
  * nekoimi  2021/8/25 16:54
  */
-@AllArgsConstructor(staticName = "event")
+@AllArgsConstructor(staticName = "of")
 public class ShutdownEvent {
 }

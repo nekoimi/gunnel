@@ -52,13 +52,13 @@ public class GunnelServer extends GunnelApplication {
         }).channel();
         ChannelFuture future = channel.closeFuture().addListener(cf -> {
             log.info("{} channel close...", name());
-            shutdown(ShutdownEvent.event());
+            shutdown(ShutdownEvent.of());
         });
         try {
             future.sync();
         } catch (InterruptedException e) {
             log.error(e.getMessage());
-            shutdown(ShutdownEvent.event());
+            shutdown(ShutdownEvent.of());
         }
     }
 
@@ -67,7 +67,7 @@ public class GunnelServer extends GunnelApplication {
             for (;;) {
                 try {
                     log.info("try restarting the {}...", name());
-                    shutdown(ShutdownEvent.event());
+                    shutdown(ShutdownEvent.of());
                     TimeUnit.SECONDS.sleep(5);
                     start();
                     log.info("restart {} success!", name());

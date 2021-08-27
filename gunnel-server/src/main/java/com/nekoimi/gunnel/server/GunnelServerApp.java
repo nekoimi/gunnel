@@ -1,20 +1,14 @@
 package com.nekoimi.gunnel.server;
 
-import com.nekoimi.gunnel.common.enums.EProtocol;
 import com.nekoimi.gunnel.common.event.EventBus;
 import com.nekoimi.gunnel.common.event.GunnelEventBus;
 import com.nekoimi.gunnel.server.context.GunnelContext;
-import com.nekoimi.gunnel.server.event.ShutdownEvent;
-import com.nekoimi.gunnel.server.event.TcpProxyRegisterEvent;
 import com.nekoimi.gunnel.server.gunnel.GunnelServer;
-import com.nekoimi.gunnel.server.ports.Port;
 import com.nekoimi.gunnel.server.proxy.TcpProxyManagerServer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * nekoimi  2021/8/13 20:52

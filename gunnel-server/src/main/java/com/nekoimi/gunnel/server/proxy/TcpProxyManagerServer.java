@@ -2,8 +2,11 @@ package com.nekoimi.gunnel.server.proxy;
 
 import com.google.common.eventbus.Subscribe;
 import com.nekoimi.gunnel.server.context.GunnelContext;
+import com.nekoimi.gunnel.server.event.ProxyUnRegisterClientEvent;
+import com.nekoimi.gunnel.server.event.ProxyUnRegisterEvent;
 import com.nekoimi.gunnel.server.event.ShutdownEvent;
-import com.nekoimi.gunnel.server.event.TcpProxyRegisterEvent;
+import com.nekoimi.gunnel.server.event.ProxyRegisterEvent;
+import com.nekoimi.gunnel.server.handler.ProxyServerHandler;
 import com.nekoimi.gunnel.server.ports.Port;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -55,8 +58,9 @@ public class TcpProxyManagerServer extends ProxyApplication {
         context().eventBus.unregister(this);
     }
 
+    @Override
     @Subscribe
-    public void register(TcpProxyRegisterEvent event) {
+    public void register(ProxyRegisterEvent event) {
         Channel channel = bootstrap.bind(event.getPort().getValue()).addListener(bf -> {
             if (bf.isSuccess()) {
                 log.info("{} bind to {} success!", name(), event.getPort());
@@ -71,10 +75,16 @@ public class TcpProxyManagerServer extends ProxyApplication {
     }
 
     @Override
-    public void unregister() {
+    @Subscribe
+    public void unregister(ProxyUnRegisterEvent event) {
 
     }
 
+    @Override
+    @Subscribe
+    public void unregister(ProxyUnRegisterClientEvent event) {
+
+    }
 
     private final static class TCPProxyServerInitializer extends ChannelInitializer<SocketChannel> {
         private final GunnelContext context;
@@ -88,7 +98,7 @@ public class TcpProxyManagerServer extends ProxyApplication {
             ChannelPipeline pipeline = ch.pipeline();
             pipeline.addLast(new ByteArrayDecoder());
             pipeline.addLast(new ByteArrayEncoder());
-//                pipeline.addLast(new ProxyServerHandler(parentHandler));
+            pipeline.addLast(new ProxyServerHandler(context.eventBus));
             // >> TODO append socket channel to proxy channel group
 //                parentHandler.channels().add(ch);
         }

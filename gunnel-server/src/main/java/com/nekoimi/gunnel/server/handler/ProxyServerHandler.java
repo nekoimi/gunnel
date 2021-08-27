@@ -1,10 +1,9 @@
 package com.nekoimi.gunnel.server.handler;
 
-import com.nekoimi.gunnel.common.enums.EMessage;
-import com.nekoimi.gunnel.common.protocol.GunnelMessage;
-import com.nekoimi.gunnel.common.protocol.message.GuConnect;
-import com.nekoimi.gunnel.common.protocol.message.GuData;
-import com.nekoimi.gunnel.common.protocol.message.GuDisconnect;
+import com.nekoimi.gunnel.common.event.EventBus;
+import com.nekoimi.gunnel.server.event.ConnectEvent;
+import com.nekoimi.gunnel.server.event.DataEvent;
+import com.nekoimi.gunnel.server.event.DisconnectEvent;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -14,9 +13,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ProxyServerHandler extends SimpleChannelInboundHandler<Object> {
-    private final GunnelServerHandler serverHandler;
-    public ProxyServerHandler(GunnelServerHandler serverHandler) {
-        this.serverHandler = serverHandler;
+    private final EventBus eventBus;
+    public ProxyServerHandler(EventBus eventBus) {
+        this.eventBus = eventBus;
     }
 
     /**
@@ -27,7 +26,7 @@ public class ProxyServerHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.debug("--- ProxyServerHandler --- channelActive: {}", ctx.channel().id());
-        serverHandler.clientContext().writeAndFlush(GunnelMessage.of(EMessage.GU_CONNECT, GuConnect.of("")));
+        eventBus.publish(ConnectEvent.of());
     }
 
     /**
@@ -40,7 +39,7 @@ public class ProxyServerHandler extends SimpleChannelInboundHandler<Object> {
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         log.debug("--- ProxyServerHandler --- channelRead0:\n {}", msg);
         byte[] data = (byte[]) msg;
-        serverHandler.clientContext().writeAndFlush(GunnelMessage.of(EMessage.GU_DATA, GuData.of("", data)));
+        eventBus.publish(DataEvent.of());
     }
 
     /**
@@ -51,6 +50,6 @@ public class ProxyServerHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         log.debug("--- ProxyServerHandler --- channelInactive: {}", ctx.channel().id());
-        serverHandler.clientContext().writeAndFlush(GunnelMessage.of(EMessage.GU_DISCONNECT, GuDisconnect.of("")));
+        eventBus.publish(DisconnectEvent.of());
     }
 }
