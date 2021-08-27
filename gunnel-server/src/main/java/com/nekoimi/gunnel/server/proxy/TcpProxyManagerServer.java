@@ -9,10 +9,7 @@ import com.nekoimi.gunnel.server.event.ProxyRegisterEvent;
 import com.nekoimi.gunnel.server.handler.ProxyServerHandler;
 import com.nekoimi.gunnel.server.ports.Port;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.bytes.ByteArrayDecoder;
@@ -41,8 +38,7 @@ public class TcpProxyManagerServer extends ProxyApplication {
         bootstrap.group(context().masterLoop, context().workerLoop)
                 .channel(NioServerSocketChannel.class)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .handler(new LoggingHandler())
-                .childHandler(new TCPProxyServerInitializer(context()));
+                .handler(new LoggingHandler());
     }
 
     @Override
@@ -61,15 +57,27 @@ public class TcpProxyManagerServer extends ProxyApplication {
     @Override
     @Subscribe
     public void register(ProxyRegisterEvent event) {
-        Channel channel = bootstrap.bind(event.getPort().getValue()).addListener(bf -> {
+        // >> TODO initializer
+        bootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
+            @Override
+            protected void initChannel(SocketChannel ch) throws Exception {
+                ChannelPipeline pipeline = ch.pipeline();
+                pipeline.addLast(new ByteArrayDecoder());
+                pipeline.addLast(new ByteArrayEncoder());
+                pipeline.addLast(new ProxyServerHandler(context.eventBus));
+                // >> TODO append socket channel to proxy channel group
+//                parentHandler.channels().add(ch);
+            }
+        });
+        // >> TODO bind and listen
+        ChannelFuture bindFuture = bootstrap.bind(event.getPort().getValue()).addListener(bf -> {
             if (bf.isSuccess()) {
                 log.info("{} bind to {} success!", name(), event.getPort());
             } else {
                 log.error("{} bind on {} failed! {}", name(), event.getPort(), bf.cause().getMessage());
             }
-        }).channel();
-        portOfChannels.putIfAbsent(event.getPort(), channel);
-        channel.closeFuture().addListener(cf -> {
+        });
+        bindFuture.channel().closeFuture().addListener(cf -> {
             log.info("bind on {} channel close...", event.getPort());
         });
     }
@@ -84,23 +92,5 @@ public class TcpProxyManagerServer extends ProxyApplication {
     @Subscribe
     public void unregister(ProxyUnRegisterClientEvent event) {
 
-    }
-
-    private final static class TCPProxyServerInitializer extends ChannelInitializer<SocketChannel> {
-        private final GunnelContext context;
-
-        private TCPProxyServerInitializer(GunnelContext context) {
-            this.context = context;
-        }
-
-        @Override
-        protected void initChannel(SocketChannel ch) throws Exception {
-            ChannelPipeline pipeline = ch.pipeline();
-            pipeline.addLast(new ByteArrayDecoder());
-            pipeline.addLast(new ByteArrayEncoder());
-            pipeline.addLast(new ProxyServerHandler(context.eventBus));
-            // >> TODO append socket channel to proxy channel group
-//                parentHandler.channels().add(ch);
-        }
     }
 }

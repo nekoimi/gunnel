@@ -8,6 +8,7 @@ import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import com.nekoimi.gunnel.common.protocol.message.GuRegister;
 import com.nekoimi.gunnel.common.protocol.request.GuLoginReq;
 import com.nekoimi.gunnel.common.protocol.response.GuLoginResp;
+import com.nekoimi.gunnel.common.utils.IdUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,7 +16,6 @@ import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -40,7 +40,7 @@ public class GunnelClientHandler extends GunnelMessageHandler {
         String os = System.getProperty("os.name");
         String arch = System.getProperty("os.arch");
         String user = System.getProperty("user.name");
-        long clientId = new Random().nextLong();
+        long clientId = IdUtils.randLong();
         GuLoginReq loginReq = GuLoginReq.of("", hostname, os, arch, user, clientId, null);
         ctx.writeAndFlush(GunnelMessage.of(EMessage.GU_LOGIN_REQ, loginReq));
     }

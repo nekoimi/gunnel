@@ -126,7 +126,7 @@ public class GunnelServer extends GunnelApplication {
             pipeline.addLast(new GunnelMessageDecoder());
             pipeline.addLast(new GunnelMessageEncoder());
             // Gunnel Server 逻辑实现处理
-            pipeline.addLast(new GunnelServerHandler(context, ch.id()));
+            pipeline.addLast(new GunnelServerHandler(context));
         }
     }
 }

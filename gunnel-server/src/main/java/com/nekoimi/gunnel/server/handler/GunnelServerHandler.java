@@ -5,15 +5,14 @@ import com.nekoimi.gunnel.common.enums.EMessage;
 import com.nekoimi.gunnel.common.enums.EProtocol;
 import com.nekoimi.gunnel.common.handler.GunnelMessageHandler;
 import com.nekoimi.gunnel.common.protocol.GunnelMessage;
-import com.nekoimi.gunnel.common.protocol.request.GuLoginReq;
 import com.nekoimi.gunnel.common.protocol.message.GuRegister;
+import com.nekoimi.gunnel.common.protocol.request.GuLoginReq;
 import com.nekoimi.gunnel.common.protocol.response.GuLoginResp;
 import com.nekoimi.gunnel.server.cache.Caches;
 import com.nekoimi.gunnel.server.context.GunnelContext;
 import com.nekoimi.gunnel.server.event.ProxyRegisterEvent;
 import com.nekoimi.gunnel.server.ports.Port;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelId;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
@@ -32,15 +31,14 @@ import java.util.concurrent.ConcurrentMap;
 @Slf4j
 public class GunnelServerHandler extends GunnelMessageHandler {
     private final ConcurrentMap<String, String> clients = Caches.newCache();
-    private static final String GROUP_NAME = "ChannelGroup-";
     private final ChannelGroup channels;
     private final GunnelContext context;
     private ChannelHandlerContext clientContext;
+    private String channelId;
 
-    public GunnelServerHandler(GunnelContext context, ChannelId channelId) {
-        log.debug("-- new GunnelServerHandler --, channelId: {}", channelId.asShortText());
+    public GunnelServerHandler(GunnelContext context) {
         this.context = context;
-        channels = new DefaultChannelGroup(GROUP_NAME + channelId.asShortText(), GlobalEventExecutor.INSTANCE);
+        channels = new DefaultChannelGroup("DefaultChannelGroup", GlobalEventExecutor.INSTANCE);
     }
 
     public ChannelGroup channels() {
