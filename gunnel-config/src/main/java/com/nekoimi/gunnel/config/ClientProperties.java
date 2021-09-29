@@ -1,4 +1,4 @@
-package com.nekoimi.gunnel.common.config;
+package com.nekoimi.gunnel.config;
 
 import com.nekoimi.gunnel.common.enums.EProtocol;
 import lombok.Getter;

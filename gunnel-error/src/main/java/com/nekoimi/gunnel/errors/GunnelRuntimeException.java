@@ -1,4 +1,4 @@
-package com.nekoimi.gunnel.common.errors;
+package com.nekoimi.gunnel.errors;
 
 /**
  * nekoimi  2021/8/14 14:22

@@ -1,4 +1,4 @@
-package com.nekoimi.gunnel.common.contract;
+package com.nekoimi.gunnel.contract;
 
 import com.nekoimi.gunnel.common.utils.JsonUtils;
 

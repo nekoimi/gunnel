@@ -1,6 +1,5 @@
-package com.nekoimi.gunnel.common.config;
+package com.nekoimi.gunnel.config;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,9 +10,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@AllArgsConstructor(staticName = "of")
-public class TcpProxyProperties {
+public class HttpProxyProperties {
     private String localIp;
     private int localPort;
-    private int remotePort;
+    private String remoteDomain;
 }

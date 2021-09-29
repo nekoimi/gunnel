@@ -1,27 +1,18 @@
-package com.nekoimi.gunnel.common.codec;
+package com.nekoimi.gunnel.codec;
 
 import com.nekoimi.gunnel.common.constants.SystemConstants;
-import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.nio.charset.StandardCharsets;
 
 /**
- * nekoimi  2021/8/14 14:17
- * <p>
- * Gunnel 消息编码器
- *
- * 数据格式查看解码器
- * @see GunnelMessageDecoder
+ * nekoimi  2021/9/29 15:45
  */
-@Slf4j
-public class GunnelMessageEncoder extends MessageToByteEncoder<GunnelMessage> {
-
+public class MessageEncoder extends MessageToByteEncoder<GunnelMessage> {
     @Override
     protected void encode(ChannelHandlerContext ctx, GunnelMessage msg, ByteBuf out) throws Exception {
         log.debug("------------------------ GunnelMessageEncoder BEGIN ------------------------");

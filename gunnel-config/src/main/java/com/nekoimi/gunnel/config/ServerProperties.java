@@ -1,4 +1,4 @@
-package com.nekoimi.gunnel.common.config;
+package com.nekoimi.gunnel.config;
 
 import lombok.Getter;
 import lombok.Setter;

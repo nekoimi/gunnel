@@ -1,8 +1,6 @@
-package com.nekoimi.gunnel.common.codec;
+package com.nekoimi.gunnel.codec;
 
-import com.nekoimi.gunnel.common.constants.SystemConstants;
-import com.nekoimi.gunnel.common.enums.EMessage;
-import com.nekoimi.gunnel.common.protocol.GunnelMessage;
+import com.nekoimi.gunnel.constants.Version;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -26,14 +24,13 @@ import java.util.List;
  * 4、要传输的数据
  */
 @Slf4j
-public class GunnelMessageDecoder extends MessageToMessageDecoder<ByteBuf> {
-
+public class MessageDecoder extends MessageToMessageDecoder<ByteBuf> {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         log.debug("------------------------ GunnelMessageDecoder BEGIN ------------------------");
         // 读取一个double数据 获取版本号 readerIndex + 8
         double version = msg.readDouble();
-        if (!(SystemConstants.PROTOCOL_VERSION == version)) {
+        if (!(Version.PROTOCOL_VERSION == version)) {
             log.warn("message version error, ignore");
             return;
         }

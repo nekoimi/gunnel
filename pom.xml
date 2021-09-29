@@ -11,6 +11,12 @@
         <module>gunnel-server</module>
         <module>gunnel-client</module>
         <module>gunnel-common</module>
+        <module>gunnel-codec</module>
+        <module>gunnel-protocol</module>
+        <module>gunnel-config</module>
+        <module>gunnel-contract</module>
+        <module>gunnel-error</module>
+        <module>gunnel-auth</module>
     </modules>
 
     <properties>
