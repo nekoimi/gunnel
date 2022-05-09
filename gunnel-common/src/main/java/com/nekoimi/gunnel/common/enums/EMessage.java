@@ -1,7 +1,6 @@
 package com.nekoimi.gunnel.common.enums;
 
 import com.nekoimi.gunnel.common.constants.GuMessage;
-import com.nekoimi.gunnel.common.errors.GunnelRuntimeException;
 import com.nekoimi.gunnel.common.protocol.message.*;
 import com.nekoimi.gunnel.common.protocol.request.GuLoginReq;
 import com.nekoimi.gunnel.common.protocol.response.GuLoginResp;

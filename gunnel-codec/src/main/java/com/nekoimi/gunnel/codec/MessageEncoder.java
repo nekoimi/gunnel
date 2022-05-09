@@ -1,9 +1,11 @@
 package com.nekoimi.gunnel.codec;
 
 import com.nekoimi.gunnel.common.constants.SystemConstants;
+import com.nekoimi.gunnel.common.protocol.GunnelMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -12,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * nekoimi  2021/9/29 15:45
  */
+@Slf4j
 public class MessageEncoder extends MessageToByteEncoder<GunnelMessage> {
     @Override
     protected void encode(ChannelHandlerContext ctx, GunnelMessage msg, ByteBuf out) throws Exception {
